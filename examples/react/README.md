@@ -1,4 +1,4 @@
-# ReAct Agent Example
+# ReAct Agent Example (WIP)
 
 This example demonstrates the ReAct (Reasoning + Acting) pattern using both conduit's high-level API and the low-level MCP package directly.
 
