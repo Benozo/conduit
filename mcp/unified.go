@@ -123,6 +123,12 @@ func (s *UnifiedServer) setupHTTPRoutes() {
 	// MCP endpoint (SSE)
 	mux.HandleFunc("/mcp", s.handleMCPHTTP)
 
+	// Direct tool call endpoint (simpler for testing)
+	mux.HandleFunc("/tool", s.handleToolCallHTTP)
+
+	// Natural language chat endpoint (Ollama chooses tools)
+	mux.HandleFunc("/chat", s.handleChatHTTP)
+
 	// ReAct endpoint
 	mux.HandleFunc("/react", s.handleReActHTTP)
 
@@ -138,8 +144,56 @@ func (s *UnifiedServer) setupHTTPRoutes() {
 	}
 }
 
+// handleToolCallHTTP handles direct tool calls (simpler than full MCP)
+func (s *UnifiedServer) handleToolCallHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Tool HTTP request received: %s %s", r.Method, r.URL.Path)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Connection", "close")
+
+	var req struct {
+		Name   string                 `json:"name"`
+		Params map[string]interface{} `json:"params"`
+	}
+
+	log.Printf("Reading request body...")
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Printf("Error decoding tool request: %v", err)
+		http.Error(w, "invalid request: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	log.Printf("Decoded tool request: name=%s, params=%+v", req.Name, req.Params)
+
+	log.Printf("Calling tool %s...", req.Name)
+	result, err := s.tools.Call(req.Name, req.Params, s.memory)
+	if err != nil {
+		log.Printf("Tool error: %v", err)
+		http.Error(w, "tool error: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Tool result: %+v", result)
+
+	response := map[string]interface{}{
+		"tool":   req.Name,
+		"result": result,
+	}
+
+	log.Printf("Sending response...")
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Printf("Error encoding response: %v", err)
+		http.Error(w, "encoding error", http.StatusInternalServerError)
+		return
+	}
+	log.Printf("Response sent successfully")
+}
+
 // handleMCPHTTP handles the SSE MCP endpoint
 func (s *UnifiedServer) handleMCPHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Printf("MCP HTTP request received: %s %s", r.Method, r.URL.Path)
+
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
@@ -147,27 +201,35 @@ func (s *UnifiedServer) handleMCPHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var req MCPRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Printf("Error decoding MCP request: %v", err)
 		http.Error(w, "invalid request", http.StatusBadRequest)
 		return
 	}
 
+	log.Printf("Decoded MCP request: %+v", req)
+
 	flusher, ok := w.(http.Flusher)
 	if !ok {
+		log.Printf("Streaming not supported")
 		http.Error(w, "streaming not supported", http.StatusInternalServerError)
 		return
 	}
 
 	s.processor.EnableStreaming(func(ctxID, token string) {
+		log.Printf("Streaming token for context %s: %s", ctxID, token)
 		fmt.Fprintf(w, "event: %s\ndata: %s\n\n", ctxID, token)
 		flusher.Flush()
 	})
 
+	log.Printf("Running processor...")
 	result, err := s.processor.Run(req)
 	if err != nil {
+		log.Printf("Processor error: %v", err)
 		fmt.Fprintf(w, "event: error\ndata: %s\n\n", err.Error())
 		return
 	}
 
+	log.Printf("Processor result: %+v", result)
 	out, _ := json.Marshal(result)
 	fmt.Fprintf(w, "event: done\ndata: %s\n\n", out)
 	flusher.Flush()
@@ -216,6 +278,76 @@ func (s *UnifiedServer) handleHealthHTTP(w http.ResponseWriter, r *http.Request)
 		"protocols": []string{"stdio", "http"},
 	}
 	json.NewEncoder(w).Encode(response)
+}
+
+// handleChatHTTP handles natural language chat with tool selection
+func (s *UnifiedServer) handleChatHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Chat HTTP request received: %s %s", r.Method, r.URL.Path)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Connection", "close")
+
+	var req struct {
+		Message     string  `json:"message"`
+		Model       string  `json:"model,omitempty"`
+		Temperature float64 `json:"temperature,omitempty"`
+		Stream      bool    `json:"stream,omitempty"`
+	}
+
+	log.Printf("Reading chat request body...")
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Printf("Error decoding chat request: %v", err)
+		http.Error(w, "invalid request: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	log.Printf("Decoded chat request: message=%s, model=%s, stream=%v", req.Message, req.Model, req.Stream)
+
+	// Force non-streaming for REST API
+	req.Stream = false
+
+	// Create MCP request with the user's message
+	mcpReq := MCPRequest{
+		SessionID: "chat-session",
+		Contexts: []ContextInput{
+			{
+				ContextID: "user-query",
+				Inputs: map[string]interface{}{
+					"query": req.Message,
+				},
+			},
+		},
+		Model:       req.Model,
+		Temperature: req.Temperature,
+		Stream:      false, // Force non-streaming
+	}
+
+	log.Printf("Running processor with request: %+v", mcpReq)
+
+	// Always use regular JSON response for REST API
+	result, err := s.processor.Run(mcpReq)
+	if err != nil {
+		log.Printf("Processor error: %v", err)
+		http.Error(w, "processing error: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Processor result: %+v", result)
+
+	response := map[string]interface{}{
+		"message": req.Message,
+		"result":  result,
+		"status":  "success",
+	}
+
+	log.Printf("Sending chat response...")
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Printf("Error encoding chat response: %v", err)
+		http.Error(w, "encoding error", http.StatusInternalServerError)
+		return
+	}
+	log.Printf("Chat response sent successfully")
 }
 
 // Shutdown gracefully shuts down the server

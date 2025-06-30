@@ -52,6 +52,8 @@ func main() {
 			"b": conduit.NumberParam("Second number to add"),
 		}, []string{"a", "b"}))
 
+	// Register another custom tool for curl
+
 	server.RegisterToolWithSchema("multiply",
 		func(params map[string]interface{}, memory *mcp.Memory) (interface{}, error) {
 			a := params["a"].(float64)

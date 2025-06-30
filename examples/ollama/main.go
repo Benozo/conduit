@@ -15,7 +15,7 @@ func main() {
 	// Get Ollama URL from environment or use default
 	ollamaURL := os.Getenv("OLLAMA_URL")
 	if ollamaURL == "" {
-		ollamaURL = "http://localhost:11434"
+		ollamaURL = "http://192.168.10.10:11434"
 	}
 
 	// Get model name from environment or use default
@@ -26,7 +26,7 @@ func main() {
 
 	// Create configuration
 	config := conduit.DefaultConfig()
-	config.Port = 8084
+	config.Port = 9090
 	config.Mode = mcp.ModeHTTP
 	config.OllamaURL = ollamaURL
 	config.EnableLogging = true
@@ -83,30 +83,8 @@ func main() {
 		}, nil
 	})
 
-	// Create Ollama model with custom configuration
-	ollamaModel := func(ctx mcp.ContextInput, req mcp.MCPRequest, memory *mcp.Memory, onToken mcp.StreamCallback) (string, error) {
-		// Use the library's Ollama model with our configuration
-		model := conduit.CreateOllamaModel(ollamaURL)
-
-		// Enhance the context with model information
-		enhancedCtx := ctx
-		if enhancedCtx.Inputs == nil {
-			enhancedCtx.Inputs = make(map[string]interface{})
-		}
-
-		// Add model name to the request if not specified
-		enhancedReq := req
-		if enhancedReq.Model == "" {
-			enhancedReq.Model = modelName
-		}
-
-		// Store conversation in memory
-		if query, ok := ctx.Inputs["query"]; ok {
-			memory.Set("last_query", query)
-		}
-
-		return model(enhancedCtx, enhancedReq, memory, onToken)
-	}
+	// Create Ollama model with tool support
+	ollamaModel := conduit.CreateOllamaToolAwareModel(ollamaURL, server.GetToolRegistry())
 
 	// Set the Ollama model
 	server.SetModel(ollamaModel)
@@ -115,6 +93,8 @@ func main() {
 	log.Printf("Try these endpoints:")
 	log.Printf("  GET  http://localhost:%d/health", config.Port)
 	log.Printf("  GET  http://localhost:%d/schema", config.Port)
+	log.Printf("  POST http://localhost:%d/tool", config.Port)
+	log.Printf("  POST http://localhost:%d/chat", config.Port)
 	log.Printf("  POST http://localhost:%d/mcp", config.Port)
 	log.Printf("  POST http://localhost:%d/react", config.Port)
 	log.Printf("")
