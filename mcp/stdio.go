@@ -74,13 +74,20 @@ type MCPInitializeResult struct {
 	ServerInfo      map[string]interface{} `json:"serverInfo"`
 }
 
+// EnhancedSchemaProvider interface for servers that provide custom tool schemas
+type EnhancedSchemaProvider interface {
+	GetToolMetadata() map[string]interface{}           // Returns custom tool metadata
+	GetToolSchema(toolName string) (interface{}, bool) // Returns schema for specific tool
+}
+
 // StdioServer handles MCP over stdio (for Copilot integration)
 type StdioServer struct {
-	tools  *ToolRegistry
-	memory *Memory
-	input  io.Reader
-	output io.Writer
-	logger *log.Logger
+	tools          *ToolRegistry
+	memory         *Memory
+	input          io.Reader
+	output         io.Writer
+	logger         *log.Logger
+	schemaProvider EnhancedSchemaProvider // Optional enhanced schema provider
 }
 
 // NewStdioServer creates a new stdio-based MCP server
@@ -91,6 +98,18 @@ func NewStdioServer(tools *ToolRegistry, memory *Memory) *StdioServer {
 		input:  os.Stdin,
 		output: os.Stdout,
 		logger: log.New(os.Stderr, "[MCP] ", log.LstdFlags),
+	}
+}
+
+// NewStdioServerWithSchemaProvider creates a new stdio server with enhanced schema support
+func NewStdioServerWithSchemaProvider(tools *ToolRegistry, memory *Memory, provider EnhancedSchemaProvider) *StdioServer {
+	return &StdioServer{
+		tools:          tools,
+		memory:         memory,
+		input:          os.Stdin,
+		output:         os.Stdout,
+		logger:         log.New(os.Stderr, "[MCP] ", log.LstdFlags),
+		schemaProvider: provider,
 	}
 }
 
@@ -219,6 +238,18 @@ func (s *StdioServer) getToolSchemas() []MCPTool {
 
 // getToolDescription returns a description for a tool
 func (s *StdioServer) getToolDescription(name string) string {
+	// Check if enhanced schema provider has custom description
+	if s.schemaProvider != nil {
+		if schema, exists := s.schemaProvider.GetToolSchema(name); exists {
+			if schemaMap, ok := schema.(map[string]interface{}); ok {
+				if desc, ok := schemaMap["description"].(string); ok {
+					return desc
+				}
+			}
+		}
+	}
+
+	// Fallback to built-in descriptions
 	descriptions := map[string]string{
 		"uppercase":         "Convert text to uppercase",
 		"lowercase":         "Convert text to lowercase",
@@ -255,6 +286,18 @@ func (s *StdioServer) getToolDescription(name string) string {
 
 // getToolInputSchema returns input schema for a tool
 func (s *StdioServer) getToolInputSchema(name string) interface{} {
+	// Check if enhanced schema provider has custom schema
+	if s.schemaProvider != nil {
+		if schema, exists := s.schemaProvider.GetToolSchema(name); exists {
+			if schemaMap, ok := schema.(map[string]interface{}); ok {
+				if inputSchema, ok := schemaMap["inputSchema"]; ok {
+					return inputSchema
+				}
+			}
+		}
+	}
+
+	// Fallback to built-in schemas
 	// Most tools use text parameter
 	textSchema := map[string]interface{}{
 		"type": "object",

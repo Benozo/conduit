@@ -82,6 +82,7 @@ Then add to your MCP client configuration (VS Code, Cline, etc.):
 - **Universal MCP Compatibility**: Works with any MCP client (VS Code Copilot, Cline, Claude Desktop, and more)
 - **Dual Protocol Support**: stdio (for MCP clients) and HTTP/SSE (for web applications)
 - **Embeddable Design**: Use as a standalone server or embed in your Go applications
+- **Enhanced Tool Registration**: Rich schema support with type validation and detailed documentation
 - **Modular Tool System**: Comprehensive text, memory, and utility tools (31+ tools) - fully tested and verified
 - **LLM Integration**: Built-in Ollama support with streaming
 - **Memory Management**: Persistent memory system for tool context
@@ -131,6 +132,48 @@ func main() {
     })
     
     // Start server
+    log.Fatal(server.Start())
+}
+```
+
+#### With Enhanced Tool Registration
+
+For tools that need rich parameter validation and documentation:
+
+```go
+package main
+
+import (
+    "log"
+    conduit "github.com/benozo/conduit/lib"
+    "github.com/benozo/conduit/lib/tools"
+    "github.com/benozo/conduit/mcp"
+)
+
+func main() {
+    config := conduit.DefaultConfig()
+    config.Mode = mcp.ModeStdio
+    
+    // Create enhanced server
+    server := conduit.NewEnhancedServer(config)
+    
+    // Register standard tools
+    tools.RegisterTextTools(server.Server)
+    tools.RegisterMemoryTools(server.Server)
+    
+    // Register custom tool with rich schema
+    server.RegisterToolWithSchema("weather",
+        func(params map[string]interface{}, memory *mcp.Memory) (interface{}, error) {
+            city := params["city"].(string)
+            return map[string]interface{}{
+                "result": fmt.Sprintf("Weather in %s: Sunny, 72°F", city),
+                "city": city, "temperature": "72°F", "condition": "Sunny",
+            }, nil
+        },
+        conduit.CreateToolMetadata("weather", "Get weather for a city", map[string]interface{}{
+            "city": conduit.StringParam("City name to get weather for"),
+        }, []string{"city"}))
+    
     log.Fatal(server.Start())
 }
 ```
@@ -277,13 +320,16 @@ config := &conduit.Config{
 ### Creating a Server
 
 ```go
-// With default config
+// Standard server with default config
 server := conduit.NewServer(nil)
 
-// With custom config
+// Standard server with custom config
 server := conduit.NewServer(config)
 
-// With custom model
+// Enhanced server with rich schema support
+server := conduit.NewEnhancedServer(config)
+
+// Standard server with custom model
 server := conduit.NewServerWithModel(config, myModelFunc)
 ```
 
@@ -301,6 +347,70 @@ server.RegisterTool("my_tool", func(params map[string]interface{}, memory *mcp.M
     return result, nil
 })
 ```
+
+### Enhanced Tool Registration (with Rich Schemas)
+
+For tools that need rich parameter validation and documentation, use the enhanced registration system:
+
+```go
+// Create enhanced server
+server := conduit.NewEnhancedServer(config)
+
+// Register standard tools (optional)
+tools.RegisterTextTools(server.Server)
+tools.RegisterMemoryTools(server.Server)
+tools.RegisterUtilityTools(server.Server)
+
+// Register custom tools with full schema metadata
+server.RegisterToolWithSchema("calculate",
+    func(params map[string]interface{}, memory *mcp.Memory) (interface{}, error) {
+        operation := params["operation"].(string)
+        a := params["a"].(float64)
+        b := params["b"].(float64)
+        
+        var result float64
+        switch operation {
+        case "add":
+            result = a + b
+        case "multiply":
+            result = a * b
+        default:
+            return nil, fmt.Errorf("unknown operation: %s", operation)
+        }
+        
+        return map[string]interface{}{"result": result}, nil
+    },
+    conduit.CreateToolMetadata("calculate", "Perform mathematical operations", map[string]interface{}{
+        "operation": conduit.EnumParam("Mathematical operation", []string{"add", "multiply"}),
+        "a":         conduit.NumberParam("First number"),
+        "b":         conduit.NumberParam("Second number"),
+    }, []string{"operation", "a", "b"}))
+
+// Start with enhanced schema support
+server.Start()
+```
+
+#### Schema Helper Functions
+
+```go
+// Parameter type helpers
+conduit.NumberParam("Description")                           // Numbers
+conduit.StringParam("Description")                           // Strings  
+conduit.BoolParam("Description")                            // Booleans
+conduit.ArrayParam("Description", "itemType")               // Arrays
+conduit.EnumParam("Description", []string{"opt1", "opt2"})  // Enums
+
+// Complete metadata builder
+conduit.CreateToolMetadata(name, description, properties, required)
+```
+
+#### Benefits of Enhanced Registration
+
+- **🔍 Rich Schemas**: Full JSON Schema validation with parameter types and descriptions
+- **📖 Better Documentation**: MCP clients show detailed parameter information
+- **✅ Type Safety**: Automatic parameter validation and error handling
+- **🎯 IDE Support**: Better autocomplete and hints in MCP clients
+- **🔧 Professional**: Production-ready tool definitions
 
 ### Model Integration
 
@@ -408,7 +518,7 @@ Check the `examples/` directory for more usage examples:
 - `stdio_example/` - **MCP stdio server** for client integration (VS Code, Cline, etc.)
 - `sse_example/` - **HTTP/SSE server** for web applications and real-time integration
 - `embedded/` - Basic embedded usage with server wrapper
-- `custom_tools/` - Creating custom tools example  
+- `custom_tools/` - **Enhanced tool registration** with rich schemas and validation  
 - `model_integration/` - Custom model integration patterns
 - `pure_library/` - Pure library usage without any server
 - `pure_library_cli/` - CLI tool using MCP components

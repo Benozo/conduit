@@ -48,6 +48,22 @@ func NewUnifiedServer(model ModelFunc, tools *ToolRegistry) *UnifiedServer {
 	}
 }
 
+// NewUnifiedServerWithSchemaProvider creates a unified server with enhanced schema support
+func NewUnifiedServerWithSchemaProvider(model ModelFunc, tools *ToolRegistry, schemaProvider EnhancedSchemaProvider) *UnifiedServer {
+	memory := NewMemory()
+	processor := NewProcessor(model, tools)
+	stdioServer := NewStdioServerWithSchemaProvider(tools, memory, schemaProvider)
+
+	return &UnifiedServer{
+		tools:       tools,
+		memory:      memory,
+		processor:   processor,
+		stdioServer: stdioServer,
+		mode:        ModeBoth,
+		port:        ":8080",
+	}
+}
+
 // SetMode sets the server operating mode
 func (s *UnifiedServer) SetMode(mode ServerMode) {
 	s.mode = mode
