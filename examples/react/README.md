@@ -2,6 +2,8 @@
 
 This example demonstrates the ReAct (Reasoning + Acting) pattern using both conduit's high-level API and the low-level MCP package directly.
 
+Note: this is a work in progress is only meant to test mcp with an llm, this could change in the future.
+
 ## What is ReAct?
 
 ReAct combines **Reasoning** and **Acting** in language models:
