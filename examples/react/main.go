@@ -32,6 +32,20 @@ func main() {
 		model = "llama3.2"
 	}
 
+	openaiKey := os.Getenv("OPENAI_API_KEY")
+	if openaiKey == "" {
+		log.Fatal("❌ OPENAI_API_KEY environment variable is required")
+	}
+
+	openaiURL := os.Getenv("OPENAI_API_URL")
+	if openaiURL == "" {
+		openaiURL = "https://api.openai.com"
+	}
+
+	modelName := os.Getenv("OPENAI_MODEL")
+	if modelName == "" {
+		modelName = "gpt-40-mini"
+	}
 	// Create enhanced server for rich tool schemas
 	server := conduit.NewEnhancedServer(config)
 
@@ -208,15 +222,18 @@ func main() {
 
 	// Set up intelligent model with fallback options
 	// Try Ollama first, fallback to smart mock if unavailable
-	ollamaModel := conduit.CreateOllamaToolAwareModel(ollamaURL, server.Server.GetToolRegistry())
+	// ollamaModel := conduit.CreateOllamaToolAwareModel(ollamaURL, server.Server.GetToolRegistry())
+	openaiModel := conduit.CreateOpenAIToolAwareModel(openaiKey, openaiURL, server.GetToolRegistry())
 
 	// Create a ReAct-enhanced model that combines Ollama with ReAct patterns
 	reactModel := func(ctx mcp.ContextInput, req mcp.MCPRequest, memory *mcp.Memory, onToken mcp.StreamCallback) (string, error) {
 		query := fmt.Sprintf("%v", ctx.Inputs["query"])
 		log.Printf("🧠 ReAct Agent processing: %s", query)
 
-		// Try Ollama first for sophisticated reasoning
-		result, err := ollamaModel(ctx, req, memory, onToken)
+		// Try Ollama or openai first for sophisticated reasoning
+		// result, err := ollamaModel(ctx, req, memory, onToken)
+		result, err := openaiModel(ctx, req, memory, onToken)
+
 		if err == nil && result != "" {
 			log.Printf("✅ Ollama ReAct processing successful")
 			return result, nil
