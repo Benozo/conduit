@@ -638,3 +638,110 @@ func sendToolResultsToOllama(ollamaURL, model, originalQuery string, messages []
 
 	return "", fmt.Errorf("ollama returned empty follow-up response")
 }
+
+// OpenAIRequest represents a request to OpenAI-compatible APIs (like DeepInfra)
+type OpenAIRequest struct {
+	Model       string          `json:"model"`
+	Messages    []OpenAIMessage `json:"messages"`
+	Temperature float64         `json:"temperature,omitempty"`
+	MaxTokens   int             `json:"max_tokens,omitempty"`
+	Stream      bool            `json:"stream"`
+}
+
+// OpenAIMessage represents a message in OpenAI format
+type OpenAIMessage struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
+// OpenAIResponse represents a response from OpenAI-compatible APIs
+type OpenAIResponse struct {
+	Choices []OpenAIChoice `json:"choices"`
+}
+
+// OpenAIChoice represents a choice in the response
+type OpenAIChoice struct {
+	Message OpenAIMessage `json:"message"`
+}
+
+// CreateOpenAICompatibleModel creates a model function for OpenAI-compatible APIs like DeepInfra
+func CreateOpenAICompatibleModel(apiURL, bearerToken string) mcp.ModelFunc {
+	return func(ctx mcp.ContextInput, req mcp.MCPRequest, memory *mcp.Memory, onToken mcp.StreamCallback) (string, error) {
+		query := fmt.Sprintf("%v", ctx.Inputs["query"])
+
+		// Use provided model or default
+		model := req.Model
+		if model == "" {
+			model = "meta-llama/Meta-Llama-3.1-8B-Instruct" // Default DeepInfra model
+		}
+
+		log.Printf("🔍 CreateOpenAICompatibleModel called with query: %s", query)
+		log.Printf("🔧 API URL: %s", apiURL)
+		log.Printf("🔧 Model: %s", model)
+
+		// Create OpenAI-compatible request
+		payload := OpenAIRequest{
+			Model: model,
+			Messages: []OpenAIMessage{
+				{
+					Role:    "user",
+					Content: query,
+				},
+			},
+			Temperature: req.Temperature,
+			MaxTokens:   1000, // Default max tokens
+			Stream:      false,
+		}
+
+		body, err := json.Marshal(payload)
+		if err != nil {
+			return "", fmt.Errorf("failed to marshal request: %w", err)
+		}
+
+		httpReq, err := http.NewRequestWithContext(context.Background(), "POST", apiURL, bytes.NewReader(body))
+		if err != nil {
+			return "", fmt.Errorf("failed to create request: %w", err)
+		}
+
+		// Set headers for OpenAI-compatible API
+		httpReq.Header.Set("Content-Type", "application/json")
+		httpReq.Header.Set("Authorization", "Bearer "+bearerToken)
+
+		client := &http.Client{Timeout: 30 * time.Second}
+		resp, err := client.Do(httpReq)
+		if err != nil {
+			return "", fmt.Errorf("failed to call API: %w", err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			bodyBytes, _ := io.ReadAll(resp.Body)
+			return "", fmt.Errorf("API returned status %d: %s", resp.StatusCode, string(bodyBytes))
+		}
+
+		var result OpenAIResponse
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return "", fmt.Errorf("failed to decode response: %w", err)
+		}
+
+		if len(result.Choices) == 0 {
+			return "", fmt.Errorf("no choices in response")
+		}
+
+		response := result.Choices[0].Message.Content
+
+		// Call token callback if provided
+		if onToken != nil {
+			onToken(ctx.ContextID, response)
+		}
+
+		log.Printf("✅ OpenAI-compatible API response received: %d characters", len(response))
+		log.Printf("💬 Response content: %s", response) // Log first 100 chars for brevity
+		return response, nil
+	}
+}
+
+// CreateDeepInfraModel creates a model function specifically for DeepInfra
+func CreateDeepInfraModel(bearerToken string) mcp.ModelFunc {
+	return CreateOpenAICompatibleModel("https://api.deepinfra.com/v1/openai/chat/completions", bearerToken)
+}

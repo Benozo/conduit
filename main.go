@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/benozo/conduit/agents"
 	conduit "github.com/benozo/conduit/lib"
 	"github.com/benozo/conduit/lib/tools"
 	"github.com/benozo/conduit/mcp"
@@ -23,6 +24,10 @@ func main() {
 			mode = mcp.ModeHTTP
 		case "--both":
 			mode = mcp.ModeBoth
+		case "--agents":
+			// Demo AI Agents functionality
+			demoAgents()
+			return
 		}
 	}
 	config.Mode = mode
@@ -74,4 +79,69 @@ func main() {
 	if err := server.Start(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+// demoAgents demonstrates the AI Agents functionality
+func demoAgents() {
+	log.Println("🤖 AI Agents Demo Mode")
+	log.Println("======================")
+
+	// Create MCP server for agents
+	config := conduit.DefaultConfig()
+	config.Mode = mcp.ModeHTTP
+	config.Port = 8080
+	config.EnableLogging = true
+
+	server := conduit.NewEnhancedServer(config)
+
+	// Register tools
+	tools.RegisterTextTools(server)
+	tools.RegisterMemoryTools(server)
+	tools.RegisterUtilityTools(server)
+
+	// Add math tools
+	server.RegisterToolWithSchema("add",
+		func(params map[string]interface{}, memory *mcp.Memory) (interface{}, error) {
+			a := params["a"].(float64)
+			b := params["b"].(float64)
+			result := a + b
+			log.Printf("🧮 Math: %.1f + %.1f = %.1f", a, b, result)
+			return map[string]interface{}{
+				"result":    result,
+				"operation": "addition",
+			}, nil
+		},
+		conduit.CreateToolMetadata("add", "Add two numbers", map[string]interface{}{
+			"a": conduit.NumberParam("First number"),
+			"b": conduit.NumberParam("Second number"),
+		}, []string{"a", "b"}))
+
+	// Create agent manager
+	agentManager := agents.NewMCPAgentManager(server)
+
+	// Create specialized agents
+	log.Println("📝 Creating AI agents...")
+	if err := agentManager.CreateSpecializedAgents(); err != nil {
+		log.Fatalf("Failed to create agents: %v", err)
+	}
+
+	// Start server
+	go func() {
+		if err := server.Start(); err != nil {
+			log.Printf("Server error: %v", err)
+		}
+	}()
+
+	// Wait and create a sample task
+	log.Println("⏳ Starting server...")
+	// In a real scenario, you would wait for proper startup
+	// For demo purposes, we'll show the concept
+
+	log.Println("✅ AI Agents ready!")
+	log.Println("🔗 Server running on http://localhost:8080")
+	log.Println("📚 See examples/ai_agents/ for complete usage examples")
+	log.Println("📖 See agents/README.md for full documentation")
+
+	// Keep running
+	select {}
 }

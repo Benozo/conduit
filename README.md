@@ -25,6 +25,7 @@ Since Conduit follows the MCP specification, it should work with:
 Tested and confirmed with
  - **Vs Code Co-Pilot**
  - **Vs Code Cline**
+ - **Warp CLI**
 
 All clients will have access to Conduit's complete toolkit of 31 tools for enhanced AI assistance.
 
@@ -39,6 +40,7 @@ Conduit's tool calling system has been thoroughly tested and verified with real 
 - **Tool Execution**: ✅ All 31 tools execute successfully
 - **Result Processing**: ✅ LLM processes tool results and generates natural responses
 - **Error Handling**: ✅ Proper error handling and user feedback
+Note: Ollama was meant for mcp testing, so expect breaking changes. main focus is to supply mcp to llm clients. 
 
 ### Example Verified Interactions
 
@@ -132,6 +134,7 @@ curl -X POST http://localhost:8080/chat \
 - **Universal MCP Compatibility**: Works with any MCP client (VS Code Copilot, Cline, Claude Desktop, and more)
 - **Advanced LLM Integration**: Built-in Ollama support with automatic tool selection and natural language processing
 - **Intelligent Tool Calling**: LLMs can automatically choose and execute tools based on conversational requests
+- **AI Agents Framework**: High-level agent management system for autonomous task execution
 - **Dual Protocol Support**: stdio (for MCP clients) and HTTP/SSE (for web applications)
 - **Embeddable Design**: Use as a standalone server or embed in your Go applications
 - **Enhanced Tool Registration**: Rich schema support with type validation and detailed documentation
@@ -140,6 +143,69 @@ curl -X POST http://localhost:8080/chat \
 - **Memory Management**: Persistent memory system for tool context and conversation history
 - **ReAct Agent**: Built-in reasoning and action capabilities
 - **Production Ready**: Configurable, robust, and thoroughly tested
+
+## 🤖 AI Agents Framework
+
+Conduit includes a powerful AI Agents framework that provides high-level abstractions for creating autonomous agents that can execute complex tasks using your MCP tools.
+
+### Key Agent Features
+
+- **Agent Management**: Create, configure, and manage multiple specialized AI agents
+- **Task Execution**: Assign complex tasks to agents with automatic planning and execution
+- **Specialized Agents**: Pre-built agents for math, text processing, memory management, and utilities
+- **Custom Agents**: Create custom agents with specific tool sets and behaviors
+- **Task Monitoring**: Real-time task progress tracking and execution monitoring
+- **Memory Integration**: Per-agent memory and context management
+
+### Quick Agent Example
+
+```go
+package main
+
+import (
+    "github.com/benozo/conduit/agents"
+    conduit "github.com/benozo/conduit/lib"
+    "github.com/benozo/conduit/lib/tools"
+)
+
+func main() {
+    // Create MCP server
+    config := conduit.DefaultConfig()
+    server := conduit.NewEnhancedServer(config)
+    tools.RegisterTextTools(server)
+    tools.RegisterMemoryTools(server)
+    tools.RegisterUtilityTools(server)
+    
+    // Create agent manager
+    agentManager := agents.NewMCPAgentManager(server)
+    
+    // Create specialized agents
+    agentManager.CreateSpecializedAgents()
+    
+    // Create and execute a math task
+    task, _ := agentManager.CreateTaskForAgent("math_agent", agents.TaskTypeMath, map[string]interface{}{
+        "a": 25.0,
+        "b": 15.0,
+        "operation": "multiply",
+    })
+    
+    // Start server and execute task
+    go server.Start()
+    agentManager.ExecuteTask(task.ID)
+    
+    // Task automatically plans and executes: 25 × 15 = 375
+}
+```
+
+### Available Agent Types
+
+- **Math Agent**: Specialized in mathematical calculations (`add`, `multiply`)
+- **Text Agent**: Text processing and analysis (`word_count`, `uppercase`, `lowercase`)
+- **Memory Agent**: Data storage and retrieval (`remember`, `recall`, `forget`)
+- **Utility Agent**: Encoding, hashing, generation (`base64_encode`, `uuid`, `timestamp`)
+- **General Agent**: Multi-purpose agent with mixed tool capabilities
+
+See [`agents/README.md`](agents/README.md) for complete documentation and examples.
 
 ## Quick Start
 
