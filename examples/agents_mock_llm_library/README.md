@@ -1,6 +1,6 @@
 # AI Agents with Mock LLM - Library Mode Example
 
-This example demonstrates how to use GoMCP's AI agents with LLM integration in **library mode** - without starting an HTTP server. This is perfect for embedding intelligent agents directly into your Go applications.
+This example demonstrates how to use ConduitMCP's AI agents with LLM integration in **library mode** - without starting an HTTP server. This is perfect for embedding intelligent agents directly into your Go applications.
 
 ## What This Example Shows
 
@@ -74,7 +74,7 @@ if err := llmAgentManager.ExecuteTaskWithLLM(task.ID); err != nil {
 ## Running the Example
 
 ```bash
-cd /path/to/gomcp
+cd /path/to/ConduitMCP
 go run examples/agents_mock_llm_library/main.go
 ```
 
@@ -237,4 +237,4 @@ manager := agents.NewLLMAgentManager(server, ollamaLLM, modelName)
 3. **Extend Agents**: Create specialized agents for your use case
 4. **Scale Up**: Use multiple agents working together
 
-This example provides a solid foundation for building intelligent, LLM-powered applications with GoMCP in library mode!
+This example provides a solid foundation for building intelligent, LLM-powered applications with ConduitMCP in library mode!

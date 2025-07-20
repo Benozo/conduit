@@ -207,6 +207,74 @@ func main() {
 
 See [`agents/README.md`](agents/README.md) for complete documentation and examples.
 
+## 🐝 SwarmGo Integration
+
+We've created a comprehensive integration with **SwarmGo** (OpenAI's Swarm multi-agent framework for Go) that enables sophisticated multi-agent coordination with MCP tools.
+
+### Multi-Agent Architecture
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Coordinator   │───▶│ ContentCreator   │    │  DataAnalyst    │
+│ (Task Router)   │    │ (Text Processing)│    │ (Data Analysis) │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                                              │
+         │              ┌──────────────────┐           │
+         └─────────────▶│ MemoryManager    │◀──────────┘
+                        │ (Info Storage)   │
+                        └──────────────────┘
+```
+
+### Key Features
+
+- **4 Specialized Agents**: Coordinator, ContentCreator, DataAnalyst, MemoryManager
+- **25+ MCP Tools**: All tools wrapped for SwarmGo compatibility
+- **Intelligent Task Routing**: Context-aware agent handoffs
+- **Shared Memory**: Cross-agent information persistence
+- **Natural Language Interface**: Human-friendly multi-agent interaction
+
+### Quick SwarmGo Example
+
+```go
+// Complex multi-agent workflow
+task := "Convert 'SwarmGo MCP Integration' to snake_case, generate UUID, and remember both"
+
+// → Coordinator routes to ContentCreator for text processing
+// → Then routes to DataAnalyst for UUID generation  
+// → Finally routes to MemoryManager for storage
+// → Result: swarm_go_mcp_integration + UUID stored in shared memory
+```
+
+### Demo Scenarios
+
+- **Text Processing**: Multi-step text transformations across agents
+- **Data Pipeline**: Analysis, encoding, and storage workflows
+- **Memory Operations**: Intelligent information management
+- **Complex Coordination**: Multi-agent task decomposition and execution
+
+See [`examples/swarmgo_mcp_integration/`](examples/swarmgo_mcp_integration/) for complete documentation and examples.
+
+### Running the SwarmGo Integration
+
+```bash
+cd examples/swarmgo_mcp_integration
+
+# Install dependencies
+go mod tidy
+
+# Set your OpenAI API key
+export OPENAI_API_KEY="your-api-key"
+
+# Run the full demo
+go run main.go
+
+# Or run the simple demo (no external dependencies)
+go run simple_demo.go
+
+# Or use the test script
+./test_swarmgo_mcp.sh
+```
+
 ## Quick Start
 
 ### As a Library (Recommended)
@@ -428,10 +496,13 @@ func main() {
 config := &conduit.Config{
     Port:          8080,              // HTTP server port
     OllamaURL:     "http://localhost:11434", // Ollama API URL
-    Mode:          mcp.ModeBoth,      // Server mode (Stdio/HTTP/Both)
-    EnableCORS:    true,              // Enable CORS for HTTP mode
-    EnableHTTPS:   false,             // Enable HTTPS
-    EnableLogging: true,              // Enable logging
+    Mode:          mcp.ServerMode    // Server mode
+    Environment  map[string]string // Environment variables
+    EnableCORS   bool              // Enable CORS
+    EnableHTTPS  bool              // Enable HTTPS
+    CertFile     string            // HTTPS certificate file
+    KeyFile      string            // HTTPS key file
+    EnableLogging bool             // Enable logging
 }
 ```
 

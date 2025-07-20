@@ -1,6 +1,6 @@
 # AI Agents with DeepInfra LLM Integration
 
-This example demonstrates how to use GoMCP's AI agents with **real LLM integration** through DeepInfra's API. DeepInfra provides access to state-of-the-art language models through an OpenAI-compatible API.
+This example demonstrates how to use ConduitMCP's AI agents with **real LLM integration** through DeepInfra's API. DeepInfra provides access to state-of-the-art language models through an OpenAI-compatible API.
 
 ## What This Example Shows
 
@@ -35,7 +35,7 @@ export DEEPINFRA_MODEL="meta-llama/Meta-Llama-3.1-8B-Instruct"
 
 ### 3. Run the Example
 ```bash
-cd /path/to/gomcp
+cd /path/to/ConduitMCP
 go run examples/agents_deepinfra/main.go
 ```
 

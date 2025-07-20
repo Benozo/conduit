@@ -32,7 +32,7 @@ export OPENAI_MODEL="gpt-4o-mini"               # Default
 
 3. Build and run:
 ```bash
-cd /path/to/gomcp
+cd /path/to/ConduitMCP
 go build -o bin/openai examples/openai/main.go
 ./bin/openai
 ```

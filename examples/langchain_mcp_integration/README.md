@@ -46,7 +46,7 @@ This example demonstrates the seamless integration of LangChain Go agents with M
 
 ```bash
 # Clone and navigate to the project
-cd /path/to/gomcp
+cd /path/to/ConduitMCP
 
 # Run with defaults (llama3.2 model, localhost:11434)
 go run examples/langchain_mcp_integration/main.go

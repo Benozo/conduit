@@ -27,7 +27,7 @@ export DEEPINFRA_MODEL=meta-llama/Meta-Llama-3.1-8B-Instruct  # optional
 
 2. **Run the Example**:
 ```bash
-cd /home/engineone/Downloads/gomcp
+cd /home/engineone/Downloads/ConduitMCP
 go run examples/agents_vue_builder/main.go
 ```
 
