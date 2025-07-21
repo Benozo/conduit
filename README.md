@@ -207,11 +207,11 @@ func main() {
 
 See [`agents/README.md`](agents/README.md) for complete documentation and examples.
 
-## 🐝 SwarmGo Integration
+## 🐝 Agent Swarm Framework
 
-We've created a comprehensive integration with **SwarmGo** (OpenAI's Swarm multi-agent framework for Go) that enables sophisticated multi-agent coordination with MCP tools.
+Conduit includes a powerful **Agent Swarm** framework inspired by OpenAI's Swarm pattern, enabling sophisticated multi-agent coordination with MCP tools. This system focuses on lightweight, scalable agent orchestration using two key primitives: **Agents** and **Handoffs**.
 
-### Multi-Agent Architecture
+### Swarm Architecture
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
@@ -227,22 +227,37 @@ We've created a comprehensive integration with **SwarmGo** (OpenAI's Swarm multi
 
 ### Key Features
 
-- **4 Specialized Agents**: Coordinator, ContentCreator, DataAnalyst, MemoryManager
-- **25+ MCP Tools**: All tools wrapped for SwarmGo compatibility
-- **Intelligent Task Routing**: Context-aware agent handoffs
-- **Shared Memory**: Cross-agent information persistence
-- **Natural Language Interface**: Human-friendly multi-agent interaction
+- **Agent Coordination**: Lightweight agent handoffs and communication
+- **Context Variables**: Shared state management across agent conversations
+- **Function Calling**: Rich tool integration with MCP server capabilities
+- **Memory Persistence**: Shared memory across agent interactions
+- **Natural Language Interface**: Human-friendly multi-agent workflows
 
-### Quick SwarmGo Example
+### Quick Swarm Example
 
 ```go
-// Complex multi-agent workflow
-task := "Convert 'SwarmGo MCP Integration' to snake_case, generate UUID, and remember both"
+// Create swarm client with MCP tools
+swarm := conduit.NewSwarmClient(mcpServer)
+
+// Define specialized agents
+coordinatorAgent := swarm.CreateAgent("coordinator", "Route tasks to appropriate agents", []string{
+    "transfer_to_content", "transfer_to_data", "transfer_to_memory",
+})
+
+contentAgent := swarm.CreateAgent("content_creator", "Handle text processing tasks", []string{
+    "uppercase", "lowercase", "snake_case", "camel_case", "word_count",
+})
+
+// Execute swarm workflow
+result := swarm.Run(coordinatorAgent, []conduit.Message{
+    {Role: "user", Content: "Convert 'Agent Swarm Integration' to snake_case and remember it"},
+}, map[string]interface{}{
+    "session_id": "demo_session",
+})
 
 // → Coordinator routes to ContentCreator for text processing
-// → Then routes to DataAnalyst for UUID generation  
-// → Finally routes to MemoryManager for storage
-// → Result: swarm_go_mcp_integration + UUID stored in shared memory
+// → Then routes to MemoryManager for storage  
+// → Result: agent_swarm_integration stored in memory
 ```
 
 ### Demo Scenarios
@@ -252,27 +267,50 @@ task := "Convert 'SwarmGo MCP Integration' to snake_case, generate UUID, and rem
 - **Memory Operations**: Intelligent information management
 - **Complex Coordination**: Multi-agent task decomposition and execution
 
-See [`examples/swarmgo_mcp_integration/`](examples/swarmgo_mcp_integration/) for complete documentation and examples.
+See [`examples/agent_swarm/`](examples/agent_swarm/), [`examples/agent_swarm_simple/`](examples/agent_swarm_simple/), and [`examples/agent_swarm_llm/`](examples/agent_swarm_llm/) for complete documentation and examples.
 
-### Running the SwarmGo Integration
+### Advanced Workflow Patterns
+
+The Agent Swarm framework includes sophisticated workflow orchestration patterns:
+
+- **Sequential**: Ordered step-by-step execution (ETL pipelines)
+- **Parallel**: Concurrent independent execution (batch processing)
+- **DAG**: Dependency-based execution graphs (complex data processing)
+- **Supervisor**: Hierarchical oversight and control (mission-critical processes)
+- **Pipeline**: Data flow through transformation stages (content processing)
+- **Conditional**: Dynamic branching based on runtime conditions (quality control)
+
+See [`examples/agent_swarm_workflows/`](examples/agent_swarm_workflows/) for advanced workflow pattern examples.
+
+### Running the Agent Swarm
 
 ```bash
-cd examples/swarmgo_mcp_integration
+# Basic agent swarm demo (rule-based)
+cd examples/agent_swarm
+go run main.go
+
+# LLM-powered agent swarm with Ollama
+cd examples/agent_swarm_llm
+go run main.go
+
+# Advanced workflow patterns demo
+cd examples/agent_swarm_workflows
+go run main.go
+
+# Simple swarm demo
+cd examples/agent_swarm_simple
 
 # Install dependencies
 go mod tidy
 
-# Set your OpenAI API key
-export OPENAI_API_KEY="your-api-key"
-
 # Run the full demo
 go run main.go
 
-# Or run the simple demo (no external dependencies)
-go run simple_demo.go
+# Or run with custom LLM integration
+go run llm_demo.go
 
 # Or use the test script
-./test_swarmgo_mcp.sh
+./test_agent_swarm.sh
 ```
 
 ## Quick Start
@@ -818,6 +856,20 @@ The `examples/` directory contains complete demonstrations of different usage pa
 - **`model_integration/`** - Custom model integration patterns
 - **`react/`** - ReAct agent with reasoning and actions
 
+### Agent & Swarm Examples
+
+- **`ai_agents/`** - AI Agents framework with task management
+- **`agents_test/`** - Basic agent functionality testing
+- **`agents_ollama/`** - Agents with Ollama LLM integration
+- **`agents_deepinfra/`** - Agents with DeepInfra LLM integration
+- **`agents_library_mode/`** - Library-mode agent usage
+- **`agents_mock_llm/`** - Mock LLM for testing agents
+- **`agents_vue_builder/`** - Vue.js application builder agent
+- **`agent_swarm/`** - Basic agent swarm coordination (rule-based)
+- **`agent_swarm_llm/`** - LLM-powered agent swarm with Ollama intelligence
+- **`agent_swarm_simple/`** - Simple agent swarm demo
+- **`agent_swarm_workflows/`** - Advanced workflow patterns (DAG, Supervisor, Pipeline, etc.)
+
 ### Running Examples
 
 ```bash
@@ -836,6 +888,26 @@ go run main.go --stdio
 
 # Test the pure library example
 cd examples/pure_library
+go run main.go
+
+# Try AI Agents framework
+cd examples/ai_agents
+go run main.go
+
+# Try basic Agent Swarm (rule-based)
+cd examples/agent_swarm
+go run main.go
+
+# Try LLM-powered Agent Swarm with Ollama
+cd examples/agent_swarm_llm
+go run main.go
+
+# Try advanced workflow patterns
+cd examples/agent_swarm_workflows
+go run main.go
+
+# Try Agents with Ollama
+cd examples/agents_ollama
 go run main.go
 ```
 
@@ -880,6 +952,17 @@ Check the `examples/` directory for more usage examples:
   - `direct_ollama/` - Direct Ollama model usage without server
 - `react/` - ReAct agent (Reasoning + Acting) pattern
   - `direct_mcp/` - Raw MCP package ReAct usage
+- `ai_agents/` - **AI Agents framework** with autonomous task execution
+- `agents_test/` - Basic agent functionality and testing
+- `agents_ollama/` - **Agents with Ollama** LLM integration
+- `agents_deepinfra/` - **Agents with DeepInfra** LLM integration
+- `agents_library_mode/` - Library-mode agent usage patterns
+- `agents_mock_llm/` - Mock LLM for agent testing and development
+- `agents_vue_builder/` - **Vue.js application builder** agent
+- `agent_swarm/` - **Basic agent swarm** coordination and handoffs (rule-based)
+- `agent_swarm_llm/` - **LLM-powered agent swarm** with Ollama intelligence
+- `agent_swarm_simple/` - **Simple agent swarm** demo
+- `agent_swarm_workflows/` - **Advanced workflow patterns** (DAG, Supervisor, Pipeline, Conditional, etc.)
 
 ### Quick Start Examples
 
@@ -912,6 +995,30 @@ cd examples/react && go run main.go
 ```bash
 cd examples/react/direct_mcp && go run main.go
 # Pure MCP package demo (no server)
+```
+
+**6. AI Agents Framework:**
+```bash
+cd examples/ai_agents && go run main.go
+# AI Agents with autonomous task execution
+```
+
+**7. Agent Swarm Basic:**
+```bash
+cd examples/agent_swarm && go run main.go
+# Multi-agent coordination and handoffs
+```
+
+**8. Advanced Workflow Patterns:**
+```bash
+cd examples/agent_swarm_workflows && go run main.go
+# DAG, Supervisor, Pipeline, and Conditional workflows
+```
+
+**9. Agents with Ollama:**
+```bash
+cd examples/agents_ollama && go run main.go
+# AI Agents powered by Ollama LLM
 ```
 
 ## Building
