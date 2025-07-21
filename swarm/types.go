@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	conduit "github.com/benozo/conduit/lib"
 	"github.com/benozo/conduit/mcp"
 )
 
@@ -20,6 +21,10 @@ type Agent struct {
 	Instructions string          `json:"instructions"`
 	Functions    []AgentFunction `json:"functions"`
 	Model        string          `json:"model"`
+
+	// NEW: Optional per-agent LLM configuration (backward compatible)
+	ModelFunc   mcp.ModelFunc        `json:"-"`                      // Individual LLM function
+	ModelConfig *conduit.ModelConfig `json:"model_config,omitempty"` // Model-specific configuration
 }
 
 // AgentFunction represents a function that an agent can call
@@ -82,6 +87,8 @@ func DefaultSwarmConfig() *SwarmConfig {
 // SwarmClient interface defines the swarm client capabilities
 type SwarmClient interface {
 	CreateAgent(name, instructions string, tools []string) *Agent
+	CreateAgentWithModel(name, instructions string, tools []string, modelConfig *conduit.ModelConfig) *Agent
+	CreateAgentWithLLM(name, instructions string, tools []string, modelFunc mcp.ModelFunc, modelName string) *Agent
 	RegisterFunction(agentName string, fn AgentFunction) error
 	Run(agent *Agent, messages []Message, contextVars map[string]interface{}) *Response
 	RunWithContext(ctx context.Context, agent *Agent, messages []Message, contextVars map[string]interface{}) *Response

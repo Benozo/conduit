@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	conduit "github.com/benozo/conduit/lib"
 	"github.com/benozo/conduit/mcp"
 )
 
@@ -123,6 +124,141 @@ func (sc *swarmClient) CreateAgent(name, instructions string, tools []string) *A
 
 		agent.Functions = append(agent.Functions, agentFunc)
 		sc.functions[toolName] = agentFunc
+	}
+
+	sc.agents[name] = agent
+	return agent
+}
+
+// CreateAgentWithModel creates a new agent with specified tools and model configuration
+func (sc *swarmClient) CreateAgentWithModel(name, instructions string, tools []string, modelConfig *conduit.ModelConfig) *Agent {
+	if modelConfig == nil {
+		modelConfig = &conduit.ModelConfig{
+			Provider:    "ollama",
+			Model:       "llama3.2",
+			URL:         "http://localhost:11434",
+			Temperature: 0.7,
+			MaxTokens:   1000,
+			TopK:        40,
+		}
+	}
+
+	// Create model function from configuration
+	modelFunc, err := conduit.CreateModelFunction(modelConfig)
+	if err != nil {
+		sc.logger.Error("Failed to create model function", "error", err, "config", modelConfig)
+		// Fallback to swarm default model
+		return sc.CreateAgent(name, instructions, tools)
+	}
+
+	agent := &Agent{
+		Name:         name,
+		Instructions: instructions,
+		Functions:    []AgentFunction{},
+		Model:        modelConfig.Model,
+		ModelFunc:    modelFunc,
+		ModelConfig:  modelConfig,
+	}
+
+	// Add MCP tools as agent functions
+	for _, toolName := range tools {
+		if strings.HasPrefix(toolName, "transfer_to_") {
+			// Handle transfer functions specially
+			continue
+		}
+
+		// Create MCP tool function
+		mcpToolFunc := AgentFunction{
+			Name:        toolName,
+			Description: fmt.Sprintf("MCP tool: %s", toolName),
+			Parameters: map[string]interface{}{
+				"type": "object",
+				"properties": map[string]interface{}{
+					"params": map[string]interface{}{
+						"type": "object",
+					},
+				},
+			},
+			Function: func(args map[string]interface{}, contextVars map[string]interface{}) Result {
+				params, ok := args["params"].(map[string]interface{})
+				if !ok {
+					params = args
+				}
+
+				result, err := sc.toolRegistry.Call(toolName, params, sc.memory)
+				if err != nil {
+					return Result{
+						Error:   err,
+						Success: false,
+					}
+				}
+
+				return Result{
+					Value:   fmt.Sprintf("Tool %s executed successfully: %v", toolName, result),
+					Success: true,
+				}
+			},
+		}
+
+		agent.Functions = append(agent.Functions, mcpToolFunc)
+	}
+
+	sc.agents[name] = agent
+	return agent
+}
+
+// CreateAgentWithLLM creates a new agent with specified tools and direct LLM function
+func (sc *swarmClient) CreateAgentWithLLM(name, instructions string, tools []string, modelFunc mcp.ModelFunc, modelName string) *Agent {
+	agent := &Agent{
+		Name:         name,
+		Instructions: instructions,
+		Functions:    []AgentFunction{},
+		Model:        modelName,
+		ModelFunc:    modelFunc,
+		ModelConfig:  nil, // No config when using direct model function
+	}
+
+	// Add MCP tools as agent functions
+	for _, toolName := range tools {
+		if strings.HasPrefix(toolName, "transfer_to_") {
+			// Handle transfer functions specially
+			continue
+		}
+
+		// Create MCP tool function
+		mcpToolFunc := AgentFunction{
+			Name:        toolName,
+			Description: fmt.Sprintf("MCP tool: %s", toolName),
+			Parameters: map[string]interface{}{
+				"type": "object",
+				"properties": map[string]interface{}{
+					"params": map[string]interface{}{
+						"type": "object",
+					},
+				},
+			},
+			Function: func(args map[string]interface{}, contextVars map[string]interface{}) Result {
+				params, ok := args["params"].(map[string]interface{})
+				if !ok {
+					params = args
+				}
+
+				result, err := sc.toolRegistry.Call(toolName, params, sc.memory)
+				if err != nil {
+					return Result{
+						Error:   err,
+						Success: false,
+					}
+				}
+
+				return Result{
+					Value:   fmt.Sprintf("Tool %s executed successfully: %v", toolName, result),
+					Success: true,
+				}
+			},
+		}
+
+		agent.Functions = append(agent.Functions, mcpToolFunc)
 	}
 
 	sc.agents[name] = agent
@@ -317,8 +453,8 @@ Respond with a JSON object containing your decision:
   "response": "direct response (if action=respond)"
 }`, systemPrompt, conversationHistory, message, sc.getAvailableToolsForAgent(agent), sc.getAvailableAgentsForHandoff(agent))
 
-	// Call LLM for reasoning
-	llmResponse, err := sc.callLLM(prompt, ctx.SessionID)
+	// Call LLM for reasoning - use agent-specific model if available
+	llmResponse, err := sc.callAgentLLM(agent, prompt, ctx.SessionID)
 	if err != nil {
 		return Result{
 			Error:   fmt.Errorf("LLM reasoning failed: %w", err),
@@ -352,6 +488,47 @@ func (sc *swarmClient) callLLM(prompt string, sessionID string) (string, error) 
 	response, err := sc.modelFunc(ctx, req, sc.memory, nil)
 	if err != nil {
 		return "", fmt.Errorf("LLM call failed: %w", err)
+	}
+
+	return response, nil
+}
+
+// callAgentLLM makes a call to the agent-specific LLM model or fallback to swarm model
+func (sc *swarmClient) callAgentLLM(agent *Agent, prompt string, sessionID string) (string, error) {
+	// Try agent-specific model first
+	modelFunc := agent.ModelFunc
+	modelName := agent.Model
+
+	// Fallback to swarm-level model if agent doesn't have one
+	if modelFunc == nil {
+		modelFunc = sc.modelFunc
+		modelName = sc.modelName
+	}
+
+	// If still no model, return error
+	if modelFunc == nil {
+		return "", fmt.Errorf("no LLM configured for agent %s or swarm", agent.Name)
+	}
+
+	// Create context for LLM call
+	ctx := mcp.ContextInput{
+		ContextID: sessionID,
+		Inputs: map[string]interface{}{
+			"query": prompt,
+		},
+	}
+
+	// Create request
+	req := mcp.MCPRequest{
+		SessionID: sessionID,
+		Model:     modelName,
+		Stream:    false,
+	}
+
+	// Call the model function
+	response, err := modelFunc(ctx, req, sc.memory, nil)
+	if err != nil {
+		return "", fmt.Errorf("agent LLM call failed: %w", err)
 	}
 
 	return response, nil

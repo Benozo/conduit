@@ -745,3 +745,227 @@ func CreateOpenAICompatibleModel(apiURL, bearerToken string) mcp.ModelFunc {
 func CreateDeepInfraModel(bearerToken string) mcp.ModelFunc {
 	return CreateOpenAICompatibleModel("https://api.deepinfra.com/v1/openai/chat/completions", bearerToken)
 }
+
+// CreateModelFunction creates a model function from configuration
+func CreateModelFunction(config interface{}) (mcp.ModelFunc, error) {
+	// Handle different config types
+	switch cfg := config.(type) {
+	case *ModelConfig:
+		return CreateModelFunctionFromConfig(cfg)
+	default:
+		return nil, fmt.Errorf("unsupported config type: %T", config)
+	}
+}
+
+// ModelConfig holds configuration for individual models (defined in swarm package)
+// We need to import it to avoid circular dependency, so we'll define a local version
+type ModelConfig struct {
+	Provider    string  `json:"provider"`
+	Model       string  `json:"model"`
+	URL         string  `json:"url,omitempty"`
+	APIKey      string  `json:"api_key,omitempty"`
+	Temperature float64 `json:"temperature"`
+	MaxTokens   int     `json:"max_tokens"`
+	TopK        int     `json:"top_k"`
+}
+
+// CreateModelFunctionFromConfig creates a model function from ModelConfig
+func CreateModelFunctionFromConfig(config *ModelConfig) (mcp.ModelFunc, error) {
+	if config == nil {
+		return nil, fmt.Errorf("model config is nil")
+	}
+
+	switch strings.ToLower(config.Provider) {
+	case "ollama":
+		return CreateOllamaModelWithConfig(config), nil
+	case "openai":
+		return CreateOpenAIModelWithConfig(config), nil
+	case "deepinfra":
+		return CreateDeepInfraModelWithConfig(config), nil
+	default:
+		return nil, fmt.Errorf("unsupported provider: %s", config.Provider)
+	}
+}
+
+// CreateOllamaModelWithConfig creates an Ollama model function with configuration
+func CreateOllamaModelWithConfig(config *ModelConfig) mcp.ModelFunc {
+	ollamaURL := config.URL
+	if ollamaURL == "" {
+		ollamaURL = "http://localhost:11434"
+	}
+
+	return func(ctx mcp.ContextInput, req mcp.MCPRequest, memory *mcp.Memory, onToken mcp.StreamCallback) (string, error) {
+		query := fmt.Sprintf("%v", ctx.Inputs["query"])
+
+		payload := OllamaRequest{
+			Model:  config.Model,
+			Prompt: query,
+			Stream: false,
+		}
+
+		body, err := json.Marshal(payload)
+		if err != nil {
+			return "", fmt.Errorf("failed to marshal request: %w", err)
+		}
+
+		httpReq, err := http.NewRequestWithContext(context.Background(), "POST", ollamaURL+"/api/generate", bytes.NewReader(body))
+		if err != nil {
+			return "", fmt.Errorf("failed to create request: %w", err)
+		}
+		httpReq.Header.Set("Content-Type", "application/json")
+
+		client := &http.Client{Timeout: 300 * time.Second}
+		resp, err := client.Do(httpReq)
+		if err != nil {
+			return "", fmt.Errorf("failed to call Ollama: %w", err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			return "", fmt.Errorf("Ollama returned status %d", resp.StatusCode)
+		}
+
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return "", fmt.Errorf("failed to read response: %w", err)
+		}
+
+		var ollamaResp OllamaChunk
+		if err := json.Unmarshal(respBody, &ollamaResp); err != nil {
+			return "", fmt.Errorf("failed to unmarshal response: %w", err)
+		}
+
+		return ollamaResp.Response, nil
+	}
+}
+
+// CreateOpenAIModelWithConfig creates an OpenAI model function with configuration
+func CreateOpenAIModelWithConfig(config *ModelConfig) mcp.ModelFunc {
+	return func(ctx mcp.ContextInput, req mcp.MCPRequest, memory *mcp.Memory, onToken mcp.StreamCallback) (string, error) {
+		query := fmt.Sprintf("%v", ctx.Inputs["query"])
+
+		// OpenAI API implementation
+		payload := map[string]interface{}{
+			"model": config.Model,
+			"messages": []map[string]string{
+				{"role": "user", "content": query},
+			},
+			"temperature": config.Temperature,
+			"max_tokens":  config.MaxTokens,
+		}
+
+		body, err := json.Marshal(payload)
+		if err != nil {
+			return "", fmt.Errorf("failed to marshal OpenAI request: %w", err)
+		}
+
+		httpReq, err := http.NewRequestWithContext(context.Background(), "POST", "https://api.openai.com/v1/chat/completions", bytes.NewReader(body))
+		if err != nil {
+			return "", fmt.Errorf("failed to create OpenAI request: %w", err)
+		}
+		httpReq.Header.Set("Content-Type", "application/json")
+		httpReq.Header.Set("Authorization", "Bearer "+config.APIKey)
+
+		client := &http.Client{Timeout: 60 * time.Second}
+		resp, err := client.Do(httpReq)
+		if err != nil {
+			return "", fmt.Errorf("failed to call OpenAI: %w", err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			return "", fmt.Errorf("OpenAI returned status %d", resp.StatusCode)
+		}
+
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return "", fmt.Errorf("failed to read OpenAI response: %w", err)
+		}
+
+		var openaiResp struct {
+			Choices []struct {
+				Message struct {
+					Content string `json:"content"`
+				} `json:"message"`
+			} `json:"choices"`
+		}
+
+		if err := json.Unmarshal(respBody, &openaiResp); err != nil {
+			return "", fmt.Errorf("failed to unmarshal OpenAI response: %w", err)
+		}
+
+		if len(openaiResp.Choices) == 0 {
+			return "", fmt.Errorf("no choices in OpenAI response")
+		}
+
+		return openaiResp.Choices[0].Message.Content, nil
+	}
+}
+
+// CreateDeepInfraModelWithConfig creates a DeepInfra model function with configuration
+func CreateDeepInfraModelWithConfig(config *ModelConfig) mcp.ModelFunc {
+	return func(ctx mcp.ContextInput, req mcp.MCPRequest, memory *mcp.Memory, onToken mcp.StreamCallback) (string, error) {
+		query := fmt.Sprintf("%v", ctx.Inputs["query"])
+
+		// DeepInfra API implementation (similar to OpenAI format)
+		payload := map[string]interface{}{
+			"model": config.Model,
+			"messages": []map[string]string{
+				{"role": "user", "content": query},
+			},
+			"temperature": config.Temperature,
+			"max_tokens":  config.MaxTokens,
+		}
+
+		body, err := json.Marshal(payload)
+		if err != nil {
+			return "", fmt.Errorf("failed to marshal DeepInfra request: %w", err)
+		}
+
+		url := "https://api.deepinfra.com/v1/openai/chat/completions"
+		if config.URL != "" {
+			url = config.URL
+		}
+
+		httpReq, err := http.NewRequestWithContext(context.Background(), "POST", url, bytes.NewReader(body))
+		if err != nil {
+			return "", fmt.Errorf("failed to create DeepInfra request: %w", err)
+		}
+		httpReq.Header.Set("Content-Type", "application/json")
+		httpReq.Header.Set("Authorization", "Bearer "+config.APIKey)
+
+		client := &http.Client{Timeout: 60 * time.Second}
+		resp, err := client.Do(httpReq)
+		if err != nil {
+			return "", fmt.Errorf("failed to call DeepInfra: %w", err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			return "", fmt.Errorf("DeepInfra returned status %d", resp.StatusCode)
+		}
+
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return "", fmt.Errorf("failed to read DeepInfra response: %w", err)
+		}
+
+		var deepinfraResp struct {
+			Choices []struct {
+				Message struct {
+					Content string `json:"content"`
+				} `json:"message"`
+			} `json:"choices"`
+		}
+
+		if err := json.Unmarshal(respBody, &deepinfraResp); err != nil {
+			return "", fmt.Errorf("failed to unmarshal DeepInfra response: %w", err)
+		}
+
+		if len(deepinfraResp.Choices) == 0 {
+			return "", fmt.Errorf("no choices in DeepInfra response")
+		}
+
+		return deepinfraResp.Choices[0].Message.Content, nil
+	}
+}

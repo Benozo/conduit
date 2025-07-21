@@ -2,6 +2,9 @@
 
 ![Conduit Banner](ConduitBanner.png)
 
+> **⚠️ BETA SOFTWARE WARNING**  
+> Conduit is currently in **beta development**. The **MCP server core functionality is stable** and ready for general use with MCP clients (VS Code Copilot, Cline, Claude Desktop). However, **LLM integration, Agent framework, and Swarm features are experimental** and still undergoing testing. Use these advanced features with caution in production environments. Please report issues and provide feedback to help improve the project.
+
 Conduit is a versatile, embeddable MCP (Model Context Protocol) server implementation in Go that supports both standalone and library usage. It provides dual protocol support (stdio for MCP clients and HTTP/SSE for web applications) and comes with a comprehensive set of tools for text manipulation, memory management, and utility functions.
 
 ## Universal MCP Compatibility
@@ -133,6 +136,7 @@ curl -X POST http://localhost:8080/chat \
 
 - **Universal MCP Compatibility**: Works with any MCP client (VS Code Copilot, Cline, Claude Desktop, and more)
 - **Advanced LLM Integration**: Built-in Ollama support with automatic tool selection and natural language processing
+- **Multi-LLM Agent Support**: Each agent can use its own specialized LLM provider (Ollama, OpenAI, DeepInfra, etc.)
 - **Intelligent Tool Calling**: LLMs can automatically choose and execute tools based on conversational requests
 - **AI Agents Framework**: High-level agent management system for autonomous task execution
 - **Dual Protocol Support**: stdio (for MCP clients) and HTTP/SSE (for web applications)
@@ -142,7 +146,7 @@ curl -X POST http://localhost:8080/chat \
 - **Natural Language Interface**: Chat with your tools using conversational AI
 - **Memory Management**: Persistent memory system for tool context and conversation history
 - **ReAct Agent**: Built-in reasoning and action capabilities
-- **Production Ready**: Configurable, robust, and thoroughly tested
+- **General Use Ready**: Configurable, robust, and thoroughly tested
 
 ## 🤖 AI Agents Framework
 
@@ -196,6 +200,52 @@ func main() {
     // Task automatically plans and executes: 25 × 15 = 375
 }
 ```
+
+## 🧠 Multi-LLM Agent Support
+
+Conduit now supports **multi-agent, multi-LLM architecture**, allowing each agent in a swarm to use its own specialized LLM provider and model. This enables optimal model selection for specific tasks while maintaining full backward compatibility.
+
+### Key Multi-LLM Features
+
+- **Per-Agent LLM Configuration**: Each agent can use a different LLM provider (Ollama, OpenAI, DeepInfra, etc.)
+- **Task-Specific Model Selection**: Match models to their strengths (code generation, content creation, analysis)
+- **Cost Optimization**: Use local models (Ollama) for routing and cloud models (GPT-4) for complex reasoning
+- **Provider Redundancy**: Fallback mechanisms and provider diversity for reliability
+- **Full Backward Compatibility**: Existing swarm code continues to work unchanged
+
+### Quick Multi-LLM Example
+
+```go
+// Create agents with different LLM providers
+coordinator := swarmClient.CreateAgentWithModel("coordinator",
+    "Route tasks efficiently", []string{},
+    &conduit.ModelConfig{
+        Provider: "ollama", Model: "llama3.2",
+        URL: "http://localhost:11434",
+    })
+
+dataAnalyst := swarmClient.CreateAgentWithModel("analyst", 
+    "Perform complex analysis", []string{"word_count"},
+    &conduit.ModelConfig{
+        Provider: "openai", Model: "gpt-4",
+        APIKey: os.Getenv("OPENAI_API_KEY"),
+    })
+
+codeGenerator := swarmClient.CreateAgentWithModel("coder",
+    "Generate optimized code", []string{"json_format"},
+    &conduit.ModelConfig{
+        Provider: "deepinfra", Model: "Qwen/Qwen2.5-Coder-32B-Instruct",
+        APIKey: os.Getenv("DEEPINFRA_API_KEY"),
+    })
+```
+
+### Supported Providers
+
+- **Ollama**: Local models (llama3.2, qwen2.5, codellama) - Fast, private, cost-effective
+- **OpenAI**: GPT-4, GPT-3.5-turbo - Premium reasoning and analysis
+- **DeepInfra**: Qwen Coder, Llama models - Specialized code generation and processing
+
+See [`examples/multi_llm_swarm/`](examples/multi_llm_swarm/) for a complete working example.
 
 ### Available Agent Types
 
@@ -430,8 +480,9 @@ go run main.go --both     # For both protocols simultaneously
 {
   "mcp.mcpServers": {
     "my-mcp-server": {
-      "command": "/path/to/my-mcp-server",
-      "args": ["--stdio"]
+        "command": "/path/to/my-mcp-server",
+        "args": ["--stdio"],
+        "env": {}
     }
   }
 }
@@ -442,6 +493,9 @@ go run main.go --both     # For both protocols simultaneously
 {
   "mcpServers": {
     "my-mcp-server": {
+      "autoApprove": [],
+      "disabled": false,
+      "timeout": 60,
       "type": "stdio",
       "command": "/path/to/my-mcp-server",
       "args": ["--stdio"]
@@ -868,7 +922,7 @@ The `examples/` directory contains complete demonstrations of different usage pa
 - **`agent_swarm/`** - Basic agent swarm coordination (rule-based)
 - **`agent_swarm_llm/`** - LLM-powered agent swarm with Ollama intelligence
 - **`agent_swarm_simple/`** - Simple agent swarm demo
-- **`agent_swarm_workflows/`** - Advanced workflow patterns (DAG, Supervisor, Pipeline, etc.)
+- **`agent_swarm_workflows/`** - Advanced workflow patterns (DAG, Supervisor, Pipeline, Conditional, etc.)
 
 ### Running Examples
 
@@ -923,9 +977,9 @@ Each example includes a README with specific instructions and use cases.
 
 ```go
 type Config struct {
-    Port         int                // HTTP server port (default: 8080)
-    OllamaURL    string            // Ollama API URL
-    Mode         mcp.ServerMode    // Server mode
+    Port:          8080,              // HTTP server port (default: 8080)
+    OllamaURL:     "http://localhost:11434", // Ollama API URL
+    Mode:          mcp.ServerMode    // Server mode
     Environment  map[string]string // Environment variables
     EnableCORS   bool              // Enable CORS
     EnableHTTPS  bool              // Enable HTTPS
