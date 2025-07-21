@@ -1,22 +1,55 @@
-# Pure MCP Library Usage
+# pure_library
 
-This example demonstrates how to use conduit as a pure library without any built-in server. Users import the MCP package and use its components directly in their own applications and servers.
+## 🧠 What It Does
 
-## Usage Pattern
+This example demonstrates how to use ConduitMCP as a pure Go library without any built-in server. It shows how to import MCP components and use them directly in your own applications, web servers, CLI tools, or gRPC services.
 
-```go
-import "github.com/benozo/conduit/mcp"
+## ⚙️ Requirements
 
-// Create components
-memory := mcp.NewMemory()
-tools := mcp.NewToolRegistry()
-processor := mcp.NewProcessor(modelFunc, tools)
+- **Go 1.21+** - For building and running
+- **No external services** - Runs completely locally
 
-// Use directly
-result, err := tools.Call("tool_name", params, memory)
+## 🚀 How to Run
+
+```bash
+# Install dependencies (if needed)
+go mod tidy
+
+# Run the pure library demo
+go run main.go
 ```
 
-## Key Components Available
+## 🔍 Components Used
+
+- **Memory** — Store and retrieve key-value data
+- **Tool Registry** — Register and execute custom tools
+- **Processor** — Process requests with tool calling (optional)
+
+## 💡 Sample Output
+
+```bash
+🔧 Pure Library Usage Demo
+========================
+
+✅ Memory Operations:
+- Set 'user_name' = 'Alice'  
+- Get 'user_name' = 'Alice'
+- Memory stats: 1 items stored
+
+✅ Tool Registry:
+- Registered tool: greeting
+- Tool result: {"message": "Hello Alice!", "timestamp": "2025-07-22T10:30:00Z"}
+
+✅ Custom Tool Execution:
+- Uppercase tool: "HELLO WORLD"
+- Math tool: 25.0 + 15.0 = 40.0
+
+🎯 Integration ready! Use these components in your app.
+```
+
+## 🧪 Test It
+
+The demo shows these usage patterns:
 
 ### 1. Memory Management
 ```go

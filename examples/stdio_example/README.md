@@ -1,31 +1,49 @@
-# Stdio MCP Example
+# stdio_example
 
-This example demonstrates how to create a Conduit MCP server that runs in stdio mode for integration with MCP clients.
+## 🧠 What It Does
 
-## What is Stdio Mode?
+This example creates a ConduitMCP server that runs in stdio mode for integration with MCP clients like VS Code Copilot, Cline, Claude Desktop, and other MCP-compatible tools. It demonstrates the standard way to create an MCP server for AI assistant integration.
 
-Stdio mode uses standard input/output for communication following the MCP (Model Context Protocol) specification. This is the standard way to integrate with MCP clients like:
+## ⚙️ Requirements
 
-- VS Code Copilot
-- Cline
-- Claude Desktop
-- Continue.dev
-- Cursor IDE
-- Any MCP-compatible client
+- **Go 1.21+** - For building the server
+- **MCP Client** - VS Code Copilot, Cline, Claude Desktop, etc.
+- **No external services** - Runs locally via stdio
 
-## Running the Example
+## 🚀 How to Run
 
 ```bash
-# Build the example
+# Build the MCP server
 go build -o stdio-mcp-server .
 
-# Test manually (optional)
+# Test manually (optional - to verify it works)
 echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}' | ./stdio-mcp-server
 
 # Use with MCP clients (see configuration below)
 ```
 
-## MCP Client Configuration
+## 🔍 Tools Available
+
+- `uppercase`, `lowercase`, `trim`, `reverse` — Text manipulation
+- `remember`, `recall`, `clear_memory`, `list_memories` — Memory management
+- `timestamp`, `uuid`, `hash_md5`, `hash_sha256` — Utility functions
+- `word_count`, `snake_case`, `camel_case` — Text analysis
+
+## 💡 Sample Output
+
+```bash
+# When built and ready:
+✅ stdio-mcp-server created successfully
+
+# When used by MCP client:
+{"jsonrpc": "2.0", "id": 1, "result": {"tools": [
+  {"name": "uppercase", "description": "Convert text to uppercase"},
+  {"name": "remember", "description": "Store information in memory"},
+  ...
+]}}
+```
+
+## 🧪 MCP Client Configuration
 
 ### VS Code Copilot
 

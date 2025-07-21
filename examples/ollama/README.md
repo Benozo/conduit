@@ -1,53 +1,33 @@
-# Ollama Integration Example
+# ollama
 
-This example demonstrates how to integrate conduit with Ollama for local LLM support.
+## 🧠 What It Does
 
-## Prerequisites
+This example demonstrates how to integrate ConduitMCP with Ollama for local LLM support. It creates an MCP server that uses locally-hosted AI models to automatically select and execute tools based on natural language requests.
 
-1. **Ollama installed and running**:
-   ```bash
-   # Install Ollama (if not already installed)
-   curl -fsSL https://ollama.ai/install.sh | sh
-   
-   # Start Ollama service
-   ollama serve
-   
-   # Pull a model (in another terminal)
-   ollama pull llama2
-   # or
-   ollama pull mistral
-   # or any other model you prefer
-   ```
+## ⚙️ Requirements
 
-2. **Verify Ollama is working**:
-   ```bash
-   curl http://localhost:11434/api/tags
-   ```
+- **Ollama installed** - Download from [ollama.com](https://ollama.com)
+- **AI model pulled** - At least one model like `llama3.2`, `qwen2.5`, etc.
+- **Go 1.21+** - For running the server
+- **8GB+ RAM** - Recommended for most models
 
-## Running the Example
+## 🚀 How to Run
 
-### Default Configuration
 ```bash
-cd examples/ollama
+# 1. Start Ollama service (in separate terminal)
+ollama serve
+
+# 2. Pull a model (choose one)
+ollama pull llama3.2        # Recommended - fast and capable
+ollama pull qwen2.5         # Alternative - good for code
+ollama pull mistral         # Alternative - compact
+
+# 3. Verify Ollama is working
+curl http://localhost:11434/api/tags
+
+# 4. Run the Conduit server
 go run main.go
 ```
-
-### Custom Configuration
-```bash
-# Set custom Ollama URL
-export OLLAMA_URL=http://192.168.10.10:11434
-
-# Set custom model
-export OLLAMA_MODEL=llama3.2
-
-# Run with custom settings
-go run main.go
-```
-
-### Direct Ollama Usage (No Server)
-To see how to use Ollama models directly without a server:
-```bash
-cd examples/ollama/direct_ollama
 go run main.go
 ```
 This demonstrates direct Ollama model integration in your applications.

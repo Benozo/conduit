@@ -1,118 +1,118 @@
-# OpenAI MCP Server Example
+# openai
 
-This example demonstrates how to create an OpenAI-powered MCP (Model Context Protocol) server using the Conduit library.
+## 🧠 What It Does
 
-## Features
+This example creates a production-ready MCP server that integrates with OpenAI's API (or OpenAI-compatible services). It demonstrates how to build a robust AI-powered tool system with comprehensive error handling, logging, and monitoring capabilities.
 
-- **OpenAI Integration**: Compatible with OpenAI API and OpenAI-compatible services
-- **Full MCP Tool Support**: Includes text processing, memory management, and utility tools
-- **HTTP API**: RESTful endpoints for easy integration
-- **Diagnostic Tools**: Built-in tools for testing and monitoring
-- **Production Ready**: Proper error handling, logging, and configuration
+## ⚙️ Requirements
 
-## Quick Start
+- **OpenAI API Key** - Get one from [OpenAI Platform](https://platform.openai.com/api-keys)
+- **Go 1.21+** - For running the server
+- **Internet connection** - For OpenAI API calls
 
-### Prerequisites
+## 🚀 How to Run
 
-1. Go 1.19 or later
-2. OpenAI API key (or compatible service)
-
-### Setup
-
-1. Set your OpenAI API key:
 ```bash
-export OPENAI_API_KEY="your-openai-api-key-here"
-```
+# Set your OpenAI API key
+export OPENAI_API_KEY="sk-your-actual-api-key-here"
 
-2. Optional: Configure custom settings:
-```bash
+# Optional: Configure custom settings
 export OPENAI_API_URL="https://api.openai.com"  # Default
 export OPENAI_MODEL="gpt-4o-mini"               # Default
+
+# Run the server
+go run main.go
 ```
 
-3. Build and run:
+## 🔍 Tools Used
+
+**Standard MCP Tools:**
+- `uppercase`, `lowercase`, `trim`, `reverse` — Text manipulation
+- `remember`, `recall`, `clear_memory`, `list_memories` — Memory management  
+- `timestamp`, `uuid`, `hash_md5`, `hash_sha256` — Utility functions
+
+**Custom OpenAI Tools:**
+- `model_info` — Get current model and connection status
+- `chat_history` — Manage conversation history with timestamps
+- `openai_test` — Test OpenAI integration with diagnostic info
+
+## 💡 Sample Output
+
 ```bash
-cd /path/to/ConduitMCP
-go build -o bin/openai examples/openai/main.go
-./bin/openai
+🧠 Using OpenAI at: https://api.openai.com
+📦 Using model: gpt-4o-mini
+🔧 Registering MCP tools...
+✅ Registered standard MCP tools: text, memory, and utility tools
+🔧 Registering custom tools...
+🚀 Starting OpenAI-powered MCP server on port 9090...
+
+📡 Available endpoints:
+  GET  http://localhost:9090/health        - Health check
+  GET  http://localhost:9090/schema        - Tool schema
+  POST http://localhost:9090/tool          - Execute tool
+  POST http://localhost:9090/chat          - Chat with AI
+  POST http://localhost:9090/mcp           - MCP protocol
+  POST http://localhost:9090/react         - ReAct reasoning
+
+🔧 Environment configuration:
+  OPENAI_API_KEY: sk-proj-...abc123
+  OPENAI_API_URL: https://api.openai.com
+  OPENAI_MODEL:   gpt-4o-mini
 ```
 
-The server will start on port 9090 by default.
-
-## Available Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET    | `/health` | Health check |
-| GET    | `/schema` | Tool schema |
-| POST   | `/tool`   | Execute tool |
-| POST   | `/chat`   | Chat with AI |
-| POST   | `/mcp`    | MCP protocol |
-| POST   | `/react`  | ReAct reasoning |
-
-## Available Tools
-
-### Standard MCP Tools
-
-**Text Processing:**
-- `uppercase` - Convert text to uppercase
-- `lowercase` - Convert text to lowercase  
-- `trim` - Remove leading/trailing whitespace
-- `reverse` - Reverse text
-
-**Memory Management:**
-- `remember` - Store key-value pairs
-- `recall` - Retrieve stored values
-- `clear_memory` - Clear all memory
-- `list_memories` - List all stored keys
-
-**Utility Tools:**
-- `timestamp` - Get current timestamp
-- `uuid` - Generate UUID
-- `hash_md5` - Generate MD5 hash
-- `hash_sha256` - Generate SHA256 hash
-
-### Custom OpenAI Tools
-
-- `model_info` - Get model and connection information
-- `chat_history` - Manage chat history
-- `openai_test` - Diagnostic tool for testing
-
-## Usage Examples
-
-### Test Server Health
+## 🧪 Test It
+### 1. Health Check
 ```bash
 curl http://localhost:9090/health
 ```
+```json
+{"status": "healthy", "timestamp": "2025-07-22T10:30:00Z"}
+```
 
-### Execute a Tool
+### 2. Model Information  
 ```bash
-# Convert text to uppercase
-curl -X POST http://localhost:9090/tool \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"uppercase","params":{"text":"hello world"}}'
-
-# Get model information
 curl -X POST http://localhost:9090/tool \
   -H 'Content-Type: application/json' \
   -d '{"name":"model_info","params":{}}'
-
-# Store and retrieve data
-curl -X POST http://localhost:9090/tool \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"remember","params":{"key":"user_name","value":"Alice"}}'
-
-curl -X POST http://localhost:9090/tool \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"recall","params":{"key":"user_name"}}'
+```
+```json
+{
+  "openai_url": "https://api.openai.com",
+  "model": "gpt-4o-mini", 
+  "status": "connected",
+  "provider": "OpenAI"
+}
 ```
 
-### Get Tool Schema
+### 3. AI Chat with Tool Calling
 ```bash
-curl http://localhost:9090/schema
+curl -X POST http://localhost:9090/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"message": "convert HELLO WORLD to lowercase and remember it"}'
+```
+```json
+{
+  "response": "I've converted 'HELLO WORLD' to lowercase as 'hello world' and stored it in memory for you.",
+  "tools_used": ["lowercase", "remember"]
+}
 ```
 
-## Configuration
+### 4. Chat History Management
+```bash
+curl -X POST http://localhost:9090/tool \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"chat_history","params":{"message":"Testing the system"}}'
+```
+
+## 📝 Sample Prompts
+
+Try these natural language requests:
+
+- `"Generate a UUID and remember it as my session ID"`
+- `"Convert 'Production Ready' to snake_case"`  
+- `"What's the MD5 hash of 'OpenAI Integration'?"`
+- `"Show me my chat history"`
+- `"Clear all my memories and start fresh"`
 
 ### Environment Variables
 

@@ -1,11 +1,11 @@
-# Conduit - Universal MCP Server
+# Conduit - Universal AI Framework & MCP Platform
 
 ![Conduit Banner](ConduitBanner.png)
 
 > **⚠️ BETA SOFTWARE WARNING**  
 > Conduit is currently in **beta development**. The **MCP server core functionality is stable** and ready for general use with MCP clients (VS Code Copilot, Cline, Claude Desktop). However, **LLM integration, Agent framework, and Swarm features are experimental** and still undergoing testing. Use these advanced features with caution in production environments. Please report issues and provide feedback to help improve the project.
 
-Conduit is a versatile, embeddable MCP (Model Context Protocol) server implementation in Go that supports both standalone and library usage. It provides dual protocol support (stdio for MCP clients and HTTP/SSE for web applications) and comes with a comprehensive set of tools for text manipulation, memory management, and utility functions.
+Conduit is a comprehensive AI framework and universal MCP platform that bridges traditional MCP tools with advanced AI agent systems. Built in Go, it provides everything from simple tool execution to sophisticated multi-agent swarms with multi-LLM coordination. Whether you need basic MCP client integration or complex autonomous AI workflows, Conduit scales from simple library usage to enterprise-grade agent orchestration with support for local models (Ollama) and cloud providers (OpenAI, DeepInfra).
 
 ## Universal MCP Compatibility
 
@@ -134,19 +134,21 @@ curl -X POST http://localhost:8080/chat \
 
 ## Features
 
-- **Universal MCP Compatibility**: Works with any MCP client (VS Code Copilot, Cline, Claude Desktop, and more)
-- **Advanced LLM Integration**: Built-in Ollama support with automatic tool selection and natural language processing
-- **Multi-LLM Agent Support**: Each agent can use its own specialized LLM provider (Ollama, OpenAI, DeepInfra, etc.)
-- **Intelligent Tool Calling**: LLMs can automatically choose and execute tools based on conversational requests
-- **AI Agents Framework**: High-level agent management system for autonomous task execution
-- **Dual Protocol Support**: stdio (for MCP clients) and HTTP/SSE (for web applications)
-- **Embeddable Design**: Use as a standalone server or embed in your Go applications
-- **Enhanced Tool Registration**: Rich schema support with type validation and detailed documentation
-- **Comprehensive Tool Suite**: 31+ battle-tested tools for text, memory, and utility operations
-- **Natural Language Interface**: Chat with your tools using conversational AI
-- **Memory Management**: Persistent memory system for tool context and conversation history
-- **ReAct Agent**: Built-in reasoning and action capabilities
-- **General Use Ready**: Configurable, robust, and thoroughly tested
+- **🌐 Universal MCP Compatibility**: Works with any MCP client (VS Code Copilot, Cline, Claude Desktop, and more)
+- **🤖 AI Agent Framework**: Complete autonomous agent system with task planning, execution, and monitoring
+- **🐝 Multi-Agent Swarms**: OpenAI Swarm-inspired coordination with intelligent task routing and handoffs
+- **🧠 Multi-LLM Architecture**: Each agent can use specialized LLM providers (Ollama, OpenAI, DeepInfra, etc.)
+- **⚡ Intelligent Tool Calling**: LLMs automatically choose and execute tools based on natural language requests
+- **🔄 Advanced Workflows**: DAG, Supervisor, Pipeline, and Conditional workflow orchestration patterns
+- **💭 ReAct Reasoning**: Built-in reasoning and action capabilities with transparent decision making
+- **🏠 Local AI Support**: Privacy-focused local models via Ollama integration
+- **☁️ Cloud AI Integration**: Production-ready OpenAI, DeepInfra, and custom API support
+- **🔧 Dual Protocol Support**: stdio (for MCP clients) and HTTP/SSE (for web applications)
+- **📚 Embeddable Design**: Use as standalone server, Go library, or embedded in existing applications
+- **🛠️ Enhanced Tool Registration**: Rich schema support with type validation and comprehensive documentation
+- **💾 Memory Management**: Persistent memory system for context, conversation history, and agent coordination
+- **🎯 Production Ready**: Enterprise-grade error handling, logging, monitoring, and configuration
+- **🛠️ Comprehensive Tool Suite**: 31+ battle-tested tools for text, memory, and utility operations
 
 ## 🤖 AI Agents Framework
 
@@ -885,6 +887,33 @@ curl -X POST http://localhost:9090/chat \
 - ✅ **Context Aware**: LLM understands tool relationships and can chain operations
 - ✅ **Error Handling**: LLM can retry or explain tool failures
 - ✅ **Rich Responses**: Get natural language explanations with tool results
+
+## 💡 Live Demos
+
+| Example | Type | Description | Try It |
+|---------|------|-------------|--------|
+| **OpenAI Integration** | Production API | Full OpenAI integration with comprehensive tools | [`examples/openai`](examples/openai) |
+| **Local Ollama** | Local LLM | Privacy-focused local AI with tool calling | [`examples/ollama`](examples/ollama) |
+| **Agent Swarm** | Multi-Agent | Intelligent agent coordination and handoffs | [`examples/agent_swarm_simple`](examples/agent_swarm_simple) |
+| **Pure Library** | Go Integration | Embed MCP components in your applications | [`examples/pure_library`](examples/pure_library) |
+
+### Quick Demo Commands
+
+```bash
+# 🤖 OpenAI-powered tool server (production-ready)
+cd examples/openai && OPENAI_API_KEY=sk-your-key go run main.go
+
+# 🏠 Local Ollama integration (privacy-focused)  
+cd examples/ollama && go run main.go
+
+# 🐝 Multi-agent coordination (autonomous)
+cd examples/agent_swarm_simple && go run main.go
+
+# 📚 Library-only usage (embeddable)
+cd examples/pure_library && go run main.go
+```
+
+**See full example list** → [`examples/README.md`](examples/README.md)
 
 ## Examples
 

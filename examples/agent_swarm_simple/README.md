@@ -1,52 +1,88 @@
-# LLM-Powered Simple Agent Swarm Demo
+# agent_swarm_simple
 
-This example demonstrates a **LLM-powered** agent swarm with simple task routing and processing capabilities using **Ollama integration**.
+## 🧠 What It Does
 
-## Overview
+This example demonstrates a **LLM-powered agent swarm** with intelligent task routing and processing capabilities. It showcases how multiple AI agents can coordinate and hand off tasks using Ollama for local LLM reasoning.
 
-The simple agent swarm consists of three specialized agents:
+## ⚙️ Requirements
 
-- **Router**: Analyzes requests and routes them to appropriate specialists using LLM reasoning
-- **TextProcessor**: Handles text processing, formatting, and manipulation tasks
-- **Analyst**: Performs data analysis and generates insights
+- **Ollama running** - Local or remote Ollama server 
+- **Compatible model** - `llama3.2`, `qwen2.5`, or similar
+- **Go 1.21+** - For building and running
+- **4GB+ RAM** - For the AI model
 
-## Key Features
-
-- 🧠 **LLM-Powered Reasoning**: All agent decisions powered by Ollama LLM (no rule-based fallback)
-- 🎯 **Intelligent Routing**: Router agent uses natural language understanding to route tasks
-- 🔧 **Smart Tool Selection**: Agents use LLM to decide which tools to use and how
-- 🔄 **Context-Aware Handoffs**: Agents can transfer tasks based on requirements
-- 💭 **Transparent Reasoning**: All decisions include LLM reasoning explanations
-
-## Prerequisites
-
-- **Ollama** running at `192.168.10.10:11434` with a compatible model (e.g., `llama3.2`)
-- Go 1.21+ for building and running the example
-
-## Configuration
-
-The example uses the following Ollama configuration:
-- **Host**: `192.168.10.10:11434` (configurable via `OLLAMA_URL` env var)
-- **Model**: `llama3.2` (configurable via `OLLAMA_MODEL` env var)
-
-## Running the Example
+## 🚀 How to Run
 
 ```bash
-# Navigate to the example directory
-cd examples/agent_swarm_simple
+# 1. Start Ollama (if not already running)
+ollama serve
 
-# Run the example
+# 2. Pull a model
+ollama pull llama3.2
+
+# 3. Configure connection (optional)
+export OLLAMA_URL="http://localhost:11434"    # Default
+export OLLAMA_MODEL="llama3.2"                # Default
+
+# 4. Run the swarm demo
 go run main.go
 ```
 
-## Demo Scenarios
+## 🔍 Agents Used
 
-The example runs four demo scenarios:
+- **Router** — Analyzes requests and routes to appropriate specialists using LLM reasoning
+- **TextProcessor** — Handles text processing, formatting, and manipulation tasks  
+- **Analyst** — Performs data analysis and generates insights
 
-1. **Text Processing Task**: Convert text to uppercase and store in memory
-2. **Text Analysis Task**: Count words and analyze text structure
-3. **Data Analysis Task**: Analyze data and store insights
-4. **Multi-Step Processing**: Combine text processing with analysis
+## 💡 Sample Output
+
+```bash
+� Starting LLM-Powered Simple Agent Swarm Demo
+
+=== Scenario 1: Text Processing Task ===
+� User: "Convert 'Agent Swarm Integration' to uppercase and remember it"
+
+🧠 Router Agent (LLM Analysis):
+- Task involves text transformation (uppercase)
+- Memory storage required
+- Routing to: TextProcessor
+
+🔧 TextProcessor Agent:
+- Using tool: uppercase
+- Result: "AGENT SWARM INTEGRATION"
+- Using tool: remember
+- Stored in memory successfully
+
+✅ Final Result: Text converted and stored
+```
+
+## 🧪 Test Scenarios
+
+The demo runs four scenarios automatically:
+
+### 1. Text Processing Task
+```
+Convert 'Agent Swarm Integration' to uppercase and remember it
+→ Router → TextProcessor → uppercase + remember tools
+```
+
+### 2. Text Analysis Task  
+```
+Count words in 'AI Agent Coordination Systems' and analyze structure
+→ Router → Analyst → word_count + analysis tools
+```
+
+### 3. Data Analysis Task
+```
+Analyze user engagement data and store insights
+→ Router → Analyst → data analysis + memory storage
+```
+
+### 4. Multi-Step Processing
+```
+Process customer feedback and generate summary report
+→ Router → TextProcessor → Analyst → Combined processing
+```
 
 ## Expected Output
 

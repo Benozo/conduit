@@ -1,43 +1,89 @@
-# Multi-LLM Agent Swarm Example
+# multi_llm_swarm
 
-This example demonstrates the new **Multi-LLM Agent Swarm** feature, where each agent can have its own LLM provider and model, enabling optimized task routing and cost management.
+## 🧠 What It Does
 
-## 🌟 What This Example Shows
+This example demonstrates the **Multi-LLM Agent Swarm** architecture where each agent uses its own specialized LLM provider and model. It showcases optimal model selection for different tasks while managing costs and performance across multiple AI providers.
 
-### **🎯 Per-Agent Model Configuration**
-- **Coordinator**: Ollama llama3.2 (fast task routing)
-- **ContentCreator**: Ollama qwen2.5 (optimized for content generation)  
-- **DataAnalyst**: OpenAI GPT-4 (premium reasoning for complex analysis)
-- **CodeGenerator**: DeepInfra Qwen Coder (specialized code generation)
+## ⚙️ Requirements
 
-### **💡 Key Benefits Demonstrated**
-1. **Task-Specific Optimization**: Use the best model for each type of task
-2. **Cost Management**: Local models for simple tasks, premium models for complex ones
-3. **Performance Tuning**: Fast models for routing, powerful models for reasoning
-4. **Provider Diversity**: Mix different LLM providers in one swarm
+**Local Models (Optional):**
+- **Ollama** - For fast, local agents
+- **Models** - `llama3.2`, `qwen2.5` pulled locally
 
-## 🚀 Quick Start
+**Cloud APIs (Optional):**
+- **OpenAI API Key** - For premium reasoning tasks
+- **DeepInfra API Key** - For specialized code generation
+- **Go 1.21+** - For running the swarm
 
-### Prerequisites
-
-1. **Ollama models** (for local agents):
-   ```bash
-   ollama serve
-   ollama pull llama3.2
-   ollama pull qwen2.5
-   ```
-
-2. **API Keys** (for cloud agents):
-   ```bash
-   export OPENAI_API_KEY="sk-..."
-   export DEEPINFRA_API_KEY="..."
-   ```
-
-### Running the Example
+## 🚀 How to Run
 
 ```bash
-# Basic demo (shows configuration, no actual LLM calls)
-cd examples/multi_llm_swarm
+# 1. Setup local models (optional)
+ollama serve
+ollama pull llama3.2    # For coordinator 
+ollama pull qwen2.5     # For content creation
+
+# 2. Set API keys (optional)
+export OPENAI_API_KEY="sk-your-openai-key"
+export DEEPINFRA_API_KEY="your-deepinfra-key"
+
+# 3. Run the multi-LLM swarm demo
+go run main.go
+```
+
+## 🔍 Agent Architecture
+
+| Agent | Provider | Model | Purpose | Cost |
+|-------|----------|-------|---------|------|
+| **Coordinator** | Ollama | `llama3.2` | Fast task routing | Free |
+| **ContentCreator** | Ollama | `qwen2.5` | Content generation | Free |
+| **DataAnalyst** | OpenAI | `gpt-4` | Complex reasoning | Premium |
+| **CodeGenerator** | DeepInfra | `Qwen Coder` | Code specialization | Mid-tier |
+
+## 💡 Sample Output
+
+```bash
+🤖 Multi-LLM Agent Swarm Demo
+============================
+
+🔧 Creating Specialized Agents:
+✅ Coordinator (Ollama llama3.2) - Task routing
+✅ ContentCreator (Ollama qwen2.5) - Text processing  
+✅ DataAnalyst (OpenAI gpt-4) - Complex analysis
+✅ CodeGenerator (DeepInfra Qwen Coder) - Code generation
+
+🎯 Task: "Analyze user data and generate Python code for visualization"
+
+📍 Coordinator: Routing to DataAnalyst for analysis...
+🧠 DataAnalyst (GPT-4): Analyzing patterns in user engagement data
+📍 Coordinator: Routing to CodeGenerator for implementation...  
+💻 CodeGenerator (Qwen Coder): Generating optimized Python visualization code
+
+✅ Result: Complete analysis + production-ready Python code
+```
+
+## 🧪 Demo Scenarios
+
+### 1. Cost-Optimized Processing
+```
+Simple text formatting → Ollama (free)
+Complex data analysis → OpenAI (premium)
+Code generation → DeepInfra (specialized)
+```
+
+### 2. Performance-Tuned Pipeline
+```
+Fast routing → Local llama3.2
+Content creation → Local qwen2.5  
+Critical reasoning → Cloud GPT-4
+```
+
+### 3. Provider Redundancy
+```
+Primary: Ollama models (always available)
+Fallback: Cloud APIs (when local unavailable)
+Specialized: Task-specific cloud models
+```
 go run main.go
 
 # Full demo with real models (requires setup above)
