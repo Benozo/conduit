@@ -195,6 +195,34 @@ func (lam *LLMAgentManager) executeTaskWithLLMReasoning(execCtx *ExecutionContex
 		task.Progress = float64(i+1) / float64(len(actionPlan))
 	}
 
+	// Step 3: Generate final response for user
+	finalResponseStep := TaskStep{
+		ID:          fmt.Sprintf("final_response_%d", time.Now().UnixNano()),
+		Name:        "final_response",
+		Description: "Generate final response for user based on executed actions",
+		Status:      TaskStatusRunning,
+		StartedAt:   timePtr(time.Now()),
+	}
+	task.Steps = append(task.Steps, finalResponseStep)
+
+	// Create prompt for final response generation
+	finalPrompt := lam.createFinalResponsePrompt(task, agent)
+
+	// Get LLM final response
+	finalResponse, err := lam.getLLMAnalysis(finalPrompt, execCtx)
+	if err != nil {
+		finalResponseStep.Status = TaskStatusFailed
+		finalResponseStep.Error = err.Error()
+		// Still return nil to not fail the whole task, just no final response
+	} else {
+		finalResponseStep.Output = map[string]interface{}{
+			"result":   finalResponse,
+			"response": finalResponse,
+		}
+		finalResponseStep.Status = TaskStatusCompleted
+		finalResponseStep.CompletedAt = timePtr(time.Now())
+	}
+
 	return nil
 }
 
@@ -641,4 +669,53 @@ func truncateString(s string, maxLength int) string {
 		return s
 	}
 	return s[:maxLength] + "..."
+}
+
+// createFinalResponsePrompt creates a prompt for generating the final user response
+func (lam *LLMAgentManager) createFinalResponsePrompt(task *Task, agent *Agent) string {
+	// Collect outputs from all completed steps
+	var stepOutputs []string
+	for _, step := range task.Steps {
+		if step.Status == TaskStatusCompleted && step.Output != nil {
+			if stepName := step.Name; stepName != "llm_reasoning" {
+				// Format the step output for the prompt
+				stepOutput := fmt.Sprintf("Tool '%s' result: %v", stepName, step.Output)
+				stepOutputs = append(stepOutputs, stepOutput)
+			}
+		}
+	}
+
+	stepResultsText := strings.Join(stepOutputs, "\n")
+	if stepResultsText == "" {
+		stepResultsText = "No tool results available."
+	}
+
+	return fmt.Sprintf(`%s
+
+USER QUERY: %s
+
+TOOL EXECUTION RESULTS:
+%s
+
+Based on the user's query and the tool execution results above, provide a helpful, conversational response. 
+- If the tools found relevant information, summarize and present it clearly
+- If searching the knowledge base, include key findings and cite sources when available
+- Be conversational and friendly
+- Format the response for readability
+- Don't mention technical details about tool execution
+
+Respond only with the final answer text, no JSON or formatting markers.`,
+		agent.SystemPrompt,
+		getStringFromInput(task.Input, "user_query"),
+		stepResultsText)
+}
+
+// Helper function to extract string values from task input
+func getStringFromInput(input map[string]interface{}, key string) string {
+	if value, exists := input[key]; exists {
+		if str, ok := value.(string); ok {
+			return str
+		}
+	}
+	return ""
 }

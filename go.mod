@@ -4,7 +4,13 @@ go 1.24.0
 
 toolchain go1.24.4
 
-require github.com/tmc/langchaingo v0.1.13
+require (
+	github.com/google/uuid v1.6.0
+	github.com/lib/pq v1.10.9
+	github.com/pgvector/pgvector-go v0.1.1
+	github.com/sashabaranov/go-openai v1.17.9
+	github.com/tmc/langchaingo v0.1.13
+)
 
 require (
 	cloud.google.com/go/iam v1.2.0 // indirect
@@ -15,7 +21,6 @@ require (
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/google/generative-ai-go v0.18.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/goph/emperror v0.17.2 // indirect
 	github.com/huandu/xstrings v1.3.3 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
