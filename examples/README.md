@@ -2,64 +2,73 @@
 
 This folder contains working examples for ConduitMCP including tool calling, LLM integration, agent frameworks, and protocol demonstrations. Each example is self-contained with clear setup instructions and sample outputs.
 
-## 🚀 Quick Start
+## ⚡ Quick Start
 
-Choose an example based on your use case:
+### 🎯 Try It Now (30 seconds)
 
-- **New to Conduit?** → Start with [`stdio_example`](./stdio_example) or [`pure_library`](./pure_library)
-- **Want LLM integration?** → Try [`ollama`](./ollama) or [`agents_ollama`](./agents_ollama)
-- **Building web apps?** → Check out [`sse_example`](./sse_example) or [`pure_library_web`](./pure_library_web)
-- **Need agent coordination?** → Explore [`agent_swarm`](./agent_swarm) or [`multi_llm_swarm`](./multi_llm_swarm)
+```bash
+# 1. Clone and enter examples
+git clone https://github.com/benozo/conduit && cd conduit/examples
 
-## 📋 Complete Example Index
+# 2. Pick your adventure:
+cd pure_library && go run main.go     # 📚 Library demo (no deps)
+cd stdio_example && go build .       # 🔌 MCP client ready  
+cd ollama && go run main.go          # 🤖 Local AI (needs Ollama)
+cd openai && OPENAI_API_KEY=sk-... go run main.go  # ☁️ Cloud AI
+```
 
-| Example | Description | Features | Complexity | Prerequisites |
-|---------|-------------|----------|------------|---------------|
-| **Core Protocol** |
-| [`stdio_example`](./stdio_example) | MCP stdio server for VS Code, Cline, etc. | stdio protocol, tool calling | ⭐ | None |
-| [`sse_example`](./sse_example) | HTTP/SSE server for web applications | HTTP API, real-time streaming | ⭐⭐ | None |
-| [`pure_mcp`](./pure_mcp) | Raw MCP protocol implementation | Pure MCP, no server wrapper | ⭐ | None |
-| **Library Usage** |
-| [`pure_library`](./pure_library) | Use Conduit as Go library | Library integration, custom tools | ⭐ | None |
-| [`pure_library_cli`](./pure_library_cli) | CLI tool with MCP components | Command-line interface | ⭐⭐ | None |
-| [`pure_library_web`](./pure_library_web) | Custom web server with MCP | Web server, custom endpoints | ⭐⭐ | None |
-| [`embedded`](./embedded) | Embed Conduit in existing apps | Application integration | ⭐⭐ | None |
-| **LLM Integration** |
-| [`ollama`](./ollama) | Local LLM with tool calling | Ollama integration, auto tool selection | ⭐⭐ | Ollama |
-| [`openai`](./openai) | OpenAI GPT with tools | OpenAI API, cloud LLM | ⭐⭐ | OpenAI API key |
-| [`model_integration`](./model_integration) | Custom model patterns | Custom LLM integration | ⭐⭐⭐ | Custom model |
-| **Tool Development** |
-| [`custom_tools`](./custom_tools) | Enhanced tool registration | Rich schemas, validation | ⭐⭐ | None |
-| [`builtin_tools_test`](./builtin_tools_test) | Test all built-in tools | Tool testing, validation | ⭐ | None |
-| **Agent Framework** |
-| [`ai_agents`](./ai_agents) | AI Agents with task management | Agent framework, task execution | ⭐⭐⭐ | None |
-| [`agents_test`](./agents_test) | Basic agent functionality | Agent testing | ⭐⭐ | None |
-| [`agents_ollama`](./agents_ollama) | Agents with Ollama LLM | AI agents, local LLM | ⭐⭐⭐ | Ollama |
-| [`agents_deepinfra`](./agents_deepinfra) | Agents with DeepInfra | AI agents, cloud inference | ⭐⭐⭐ | DeepInfra API |
-| [`agents_library_mode`](./agents_library_mode) | Library-mode agent usage | Agent patterns | ⭐⭐ | None |
-| [`agents_mock_llm`](./agents_mock_llm) | Mock LLM for testing | Testing, development | ⭐⭐ | None |
-| [`agents_vue_builder`](./agents_vue_builder) | Vue.js app builder agent | Code generation, Vue.js | ⭐⭐⭐ | None |
-| **Agent Swarm** |
-| [`agent_swarm`](./agent_swarm) | Basic agent coordination | Multi-agent, handoffs | ⭐⭐⭐ | None |
-| [`agent_swarm_llm`](./agent_swarm_llm) | LLM-powered agent swarm | LLM coordination, Ollama | ⭐⭐⭐⭐ | Ollama |
-| [`agent_swarm_simple`](./agent_swarm_simple) | Simple swarm demo | Basic swarm patterns | ⭐⭐ | None |
-| [`agent_swarm_workflows`](./agent_swarm_workflows) | Advanced workflow patterns | DAG, Supervisor, Pipeline | ⭐⭐⭐⭐ | None |
-| [`multi_llm_swarm`](./multi_llm_swarm) | Multi-LLM agent architecture | Multiple LLM providers | ⭐⭐⭐⭐ | Multiple APIs |
-| **RAG & Advanced** |
-| [`rag`](./rag) | RAG with document processing | Document analysis, embeddings | ⭐⭐⭐ | Vector DB |
-| [`rag_chat_terminal`](./rag_chat_terminal) | Terminal RAG chat interface | CLI RAG, interactive | ⭐⭐⭐ | Documents |
-| [`rag_real_world`](./rag_real_world) | Production RAG patterns | Real-world RAG | ⭐⭐⭐⭐ | Vector DB |
-| [`langchain_mcp_integration`](./langchain_mcp_integration) | LangChain integration | LangChain + MCP | ⭐⭐⭐ | LangChain |
-| **Specialized** |
-| [`simple_mcp_agent`](./simple_mcp_agent) | Minimal MCP agent | Basic agent pattern | ⭐ | None |
-| [`comprehensive_test`](./comprehensive_test) | Full system testing | Integration testing | ⭐⭐ | None |
-| [`agents_html_amender`](./agents_html_amender) | HTML processing agent | HTML manipulation | ⭐⭐ | None |
+### 🎯 Choose Your Path
 
-**Complexity Legend:**
-- ⭐ = Beginner (5 min setup)
-- ⭐⭐ = Intermediate (15 min setup)
-- ⭐⭐⭐ = Advanced (30 min setup)
-- ⭐⭐⭐⭐ = Expert (1+ hour setup)
+- **🆕 New to Conduit?** → [`pure_library`](./pure_library) • [`stdio_example`](./stdio_example)
+- **🤖 Want Local AI?** → [`ollama`](./ollama) • [`agents_ollama`](./agents_ollama)  
+- **☁️ Need Cloud AI?** → [`openai`](./openai) • [`agents_deepinfra`](./agents_deepinfra)
+- **🐝 Multi-Agent Systems?** → [`agent_swarm_simple`](./agent_swarm_simple) • [`multi_llm_swarm`](./multi_llm_swarm)
+- **🌐 Web Integration?** → [`sse_example`](./sse_example) • [`pure_library_web`](./pure_library_web)
+
+## 📋 Example Gallery
+
+| Example | Type | Description | Features | Setup Time |
+|---------|------|-------------|----------|------------|
+| **🔌 Protocol & Integration** |
+| [`stdio_example`](./stdio_example) | ![MCP](https://img.shields.io/badge/MCP-Compatible-blue) | MCP stdio server for VS Code, Cline, etc. | stdio protocol, tool calling | ⚡ 1 min |
+| [`sse_example`](./sse_example) | ![Web](https://img.shields.io/badge/Web-HTTP/SSE-green) | HTTP/SSE server for web applications | HTTP API, real-time streaming | ⚡ 2 min |
+| [`pure_mcp`](./pure_mcp) | ![Core](https://img.shields.io/badge/Core-MCP-purple) | Raw MCP protocol implementation | Pure MCP, no server wrapper | ⚡ 1 min |
+| **📚 Library Usage** |
+| [`pure_library`](./pure_library) | ![Library](https://img.shields.io/badge/Library-Go-cyan) | Use Conduit as Go library | Library integration, custom tools | ⚡ 1 min |
+| [`pure_library_cli`](./pure_library_cli) | ![CLI](https://img.shields.io/badge/CLI-Terminal-orange) | CLI tool with MCP components | Command-line interface | ⚡ 2 min |
+| [`pure_library_web`](./pure_library_web) | ![Web](https://img.shields.io/badge/Web-Custom-green) | Custom web server with MCP | Web server, custom endpoints | ⚡ 3 min |
+| [`embedded`](./embedded) | ![Embedded](https://img.shields.io/badge/Embedded-App-yellow) | Embed Conduit in existing apps | Application integration | ⚡ 3 min |
+| **🤖 LLM Integration** |
+| [`ollama`](./ollama) | ![Local](https://img.shields.io/badge/Local-Ollama-red) | Local LLM with tool calling | Ollama integration, auto tool selection | 🔥 5 min |
+| [`openai`](./openai) | ![Cloud](https://img.shields.io/badge/Cloud-OpenAI-blue) | OpenAI GPT with tools | OpenAI API, cloud LLM | 🔥 3 min |
+| [`model_integration`](./model_integration) | ![Custom](https://img.shields.io/badge/Custom-Model-purple) | Custom model patterns | Custom LLM integration | 🚀 10 min |
+| **🛠️ Tool Development** |
+| [`custom_tools`](./custom_tools) | ![Tools](https://img.shields.io/badge/Tools-Enhanced-green) | Enhanced tool registration | Rich schemas, validation | ⚡ 3 min |
+| [`builtin_tools_test`](./builtin_tools_test) | ![Test](https://img.shields.io/badge/Test-Tools-gray) | Test all built-in tools | Tool testing, validation | ⚡ 1 min |
+| **🤖 AI Agents** |
+| [`ai_agents`](./ai_agents) | ![Agents](https://img.shields.io/badge/Agents-Framework-purple) | AI Agents with task management | Agent framework, task execution | 🚀 10 min |
+| [`agents_test`](./agents_test) | ![Test](https://img.shields.io/badge/Test-Agents-gray) | Basic agent functionality | Agent testing | ⚡ 2 min |
+| [`agents_ollama`](./agents_ollama) | ![Local+AI](https://img.shields.io/badge/Local-Agents-red) | Agents with Ollama LLM | AI agents, local LLM | 🔥 5 min |
+| [`agents_deepinfra`](./agents_deepinfra) | ![Cloud+AI](https://img.shields.io/badge/Cloud-Agents-blue) | Agents with DeepInfra | AI agents, cloud inference | 🔥 5 min |
+| [`agents_library_mode`](./agents_library_mode) | ![Library+AI](https://img.shields.io/badge/Library-Agents-cyan) | Library-mode agent usage | Agent patterns | ⚡ 3 min |
+| [`agents_mock_llm`](./agents_mock_llm) | ![Mock](https://img.shields.io/badge/Mock-Testing-gray) | Mock LLM for testing | Testing, development | ⚡ 2 min |
+| [`agents_vue_builder`](./agents_vue_builder) | ![Code](https://img.shields.io/badge/Code-Vue.js-green) | Vue.js app builder agent | Code generation, Vue.js | 🚀 15 min |
+| **🐝 Agent Swarms** |
+| [`agent_swarm_simple`](./agent_swarm_simple) | ![Swarm](https://img.shields.io/badge/Swarm-Simple-orange) | Simple swarm demo | Basic swarm patterns | 🔥 5 min |
+| [`agent_swarm`](./agent_swarm) | ![Swarm](https://img.shields.io/badge/Swarm-Advanced-orange) | Basic agent coordination | Multi-agent, handoffs | 🚀 10 min |
+| [`agent_swarm_llm`](./agent_swarm_llm) | ![Swarm+LLM](https://img.shields.io/badge/Swarm-LLM-red) | LLM-powered agent swarm | LLM coordination, Ollama | 🚀 15 min |
+| [`agent_swarm_workflows`](./agent_swarm_workflows) | ![Workflows](https://img.shields.io/badge/Workflows-DAG-purple) | Advanced workflow patterns | DAG, Supervisor, Pipeline | 🚀 20 min |
+| [`multi_llm_swarm`](./multi_llm_swarm) | ![Multi-LLM](https://img.shields.io/badge/Multi-LLM-Enterprise-gold) | Multi-LLM agent architecture | Multiple LLM providers | 🚀 20 min |
+| **📖 RAG & Advanced** |
+| [`rag`](./rag) | ![RAG](https://img.shields.io/badge/RAG-Documents-brown) | RAG with document processing | Document analysis, embeddings | 🚀 15 min |
+| [`rag_chat_terminal`](./rag_chat_terminal) | ![RAG+CLI](https://img.shields.io/badge/RAG-Terminal-brown) | Terminal RAG chat interface | CLI RAG, interactive | 🚀 10 min |
+| [`rag_real_world`](./rag_real_world) | ![RAG+Prod](https://img.shields.io/badge/RAG-Production-brown) | Production RAG patterns | Real-world RAG | 🚀 30 min |
+| [`langchain_mcp_integration`](./langchain_mcp_integration) | ![LangChain](https://img.shields.io/badge/LangChain-Bridge-brown) | LangChain integration | LangChain + MCP | 🚀 15 min |
+
+**Setup Time Legend:**
+- ⚡ = 1-3 min (no external deps)  
+- 🔥 = 5-10 min (needs API keys or local services)
+- 🚀 = 15-30 min (complex setup or multiple services)
 
 ## 🎯 Use Case Guide
 
@@ -89,31 +98,55 @@ Choose an example based on your use case:
 **Develop custom tools:**
 → [`custom_tools`](./custom_tools) → [`builtin_tools_test`](./builtin_tools_test)
 
-## 🏃‍♂️ Run All Examples
-
-```bash
-# Run the quick setup script
-./run_all.sh
-
-# Or test specific categories
-./run_all.sh --protocol     # stdio, sse, pure_mcp
-./run_all.sh --llm          # ollama, openai, model_integration
-./run_all.sh --agents       # ai_agents, agent_swarm, multi_llm_swarm
-./run_all.sh --rag          # rag examples
-```
-
 ## 📖 Documentation Standards
 
-Each example follows this structure:
+Each example follows our standardized documentation format for consistency and usability:
 
-```
-example_name/
-├── README.md          # Standardized docs with setup & examples
-├── main.go           # Primary executable
-├── go.mod            # Dependencies
-├── test_*.sh         # Test scripts (optional)
-└── media/            # Screenshots/GIFs (optional)
-```
+### ✅ **Required Elements**
+- **🧠 What It Does** - Clear purpose and use case
+- **⚙️ Requirements** - Prerequisites and dependencies  
+- **🚀 How to Run** - Step-by-step setup commands
+- **✅ Sample Output** - Realistic terminal output examples
+
+### 🎯 **Quality Standards** 
+- Copy-pasteable commands that actually work
+- Real terminal output (not pseudo-code)
+- Troubleshooting for common issues
+- Cross-references to related examples
+
+### 📝 **Template Available**
+New examples should use our standardized template: [`_README_TEMPLATE.md`](./_README_TEMPLATE.md)
+
+### 📊 **Documentation Status**
+
+| Category | Examples | ✅ Complete | 🔄 In Progress | ❌ Missing |
+|----------|----------|-------------|---------------|------------|
+| **Protocol** | 3 | 2 | 1 | 0 |
+| **Library** | 4 | 2 | 1 | 1 |
+| **LLM** | 3 | 2 | 1 | 0 |
+| **Agents** | 7 | 3 | 2 | 2 |
+| **Swarms** | 5 | 3 | 1 | 1 |
+| **RAG** | 4 | 1 | 1 | 2 |
+
+**Target: 100% documentation coverage with sample output and troubleshooting**
+
+## 🎥 Visual Previews
+
+We're working on adding visual demonstrations to each example:
+
+### 🎬 **Coming Soon**
+- Terminal recordings (asciinema) for complex workflows
+- Screenshots for web-based examples
+- GIF demos for agent interactions
+- Interactive browser demos
+
+### 📝 **Current Status**
+- **Sample Output**: ✅ Text-based examples in all major READMEs
+- **Screenshots**: 🔄 In progress for web examples
+- **GIFs**: 🔄 Planned for agent and swarm examples
+- **Interactive Demos**: 💡 Future enhancement
+
+**Help Wanted**: Contribute visual content via PRs!
 
 ## 🤝 Contributing
 
