@@ -1,0 +1,54 @@
+agent_parameters:
+  default_model: "openai"
+  models:
+    - name: "openai"
+      type: "api"
+      endpoint: "https://api.openai.com/v1/engines/davinci-codex/completions"
+      api_key: "YOUR_OPENAI_API_KEY"
+    - name: "anthropic"
+      type: "api"
+      endpoint: "https://api.anthropic.com/v1/engines/claude/completions"
+      api_key: "YOUR_ANTHROPIC_API_KEY"
+    - name: "local"
+      type: "local"
+      path: "/path/to/local/model"
+
+workflow_definitions:
+  rag_workflow:
+    description: "Workflow for Retrieve, Analyze, Generate process"
+    steps:
+      - agent: "retriever"
+        action: "retrieve_information"
+      - agent: "evaluator"
+        action: "evaluate_retrieved_information"
+      - agent: "generator"
+        action: "generate_content"
+
+  react_workflow:
+    description: "Workflow for React loop"
+    steps:
+      - agent: "reasoner"
+        action: "analyze_situation"
+      - agent: "actor"
+        action: "perform_action"
+      - agent: "observer"
+        action: "monitor_action"
+
+logging:
+  level: "info"
+  output: "logs/swarm.log"
+
+memory:
+  shared_memory_enabled: true
+  persistence_enabled: true
+  context_management: true
+
+agent_settings:
+  max_agents: 10
+  timeout: 30
+  retry_attempts: 3
+
+features:
+  enable_handoffs: true
+  enable_context_sharing: true
+  enable_custom_workflows: true
