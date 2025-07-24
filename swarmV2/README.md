@@ -1,6 +1,6 @@
-# Conduit SwarmV2 Framework
+# Neuron Swarm Framework
 
-The Conduit SwarmV2 Framework is a next-generation, production-ready multi-agent system designed for complex AI workflows. It provides a unified architecture for coordinating multiple AI agents, integrating various language models, and implementing advanced patterns like RAG (Retrieve-Augment-Generate) and ReAct (Reasoning and Acting).
+The Neuron Swarm Framework is a next-generation, production-ready multi-agent system designed for complex AI workflows. It provides a unified architecture for coordinating multiple AI agents, integrating various language models, and implementing advanced patterns like RAG (Retrieve-Augment-Generate) and ReAct (Reasoning and Acting).
 
 ## 🚀 Key Features
 
