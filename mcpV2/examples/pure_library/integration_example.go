@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/modelcontextprotocol/go-sdk/library"
-	"github.com/modelcontextprotocol/go-sdk/protocol"
+	"github.com/benozo/neuron-mcp/library"
+	"github.com/benozo/neuron-mcp/protocol"
 )
 
 // MyApp demonstrates embedding MCP library functionality

@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/modelcontextprotocol/go-sdk/library"
-	"github.com/modelcontextprotocol/go-sdk/protocol"
+	"github.com/benozo/neuron-mcp/library"
+	"github.com/benozo/neuron-mcp/protocol"
 )
 
 // BenchmarkToolCall benchmarks direct tool calls in library mode

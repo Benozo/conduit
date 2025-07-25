@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/modelcontextprotocol/go-sdk/middleware"
-	"github.com/modelcontextprotocol/go-sdk/protocol"
-	"github.com/modelcontextprotocol/go-sdk/server"
+	"github.com/benozo/neuron-mcp/middleware"
+	"github.com/benozo/neuron-mcp/protocol"
+	"github.com/benozo/neuron-mcp/server"
 )
 
 // TestIntegration verifies that all components work together correctly

@@ -1,4 +1,4 @@
-module github.com/modelcontextprotocol/go-sdk
+module github.com/benozo/neuron-mcp
 
 go 1.21
 

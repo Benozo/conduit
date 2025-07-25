@@ -45,11 +45,11 @@ package mcp
 
 // Re-export commonly used types and functions for convenience
 import (
-	"github.com/modelcontextprotocol/go-sdk/client"
-	"github.com/modelcontextprotocol/go-sdk/library"
-	"github.com/modelcontextprotocol/go-sdk/protocol"
-	"github.com/modelcontextprotocol/go-sdk/server"
-	"github.com/modelcontextprotocol/go-sdk/transport"
+	"github.com/benozo/neuron-mcp/client"
+	"github.com/benozo/neuron-mcp/library"
+	"github.com/benozo/neuron-mcp/protocol"
+	"github.com/benozo/neuron-mcp/server"
+	"github.com/benozo/neuron-mcp/transport"
 )
 
 // Protocol types and constants

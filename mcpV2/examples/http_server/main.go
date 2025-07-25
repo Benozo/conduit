@@ -15,10 +15,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/modelcontextprotocol/go-sdk/middleware"
-	"github.com/modelcontextprotocol/go-sdk/protocol"
-	"github.com/modelcontextprotocol/go-sdk/server"
-	"github.com/modelcontextprotocol/go-sdk/transport"
+	"github.com/benozo/neuron-mcp/middleware"
+	"github.com/benozo/neuron-mcp/protocol"
+	"github.com/benozo/neuron-mcp/server"
+	"github.com/benozo/neuron-mcp/transport"
 )
 
 // SimpleLogger implements the middleware.Logger interface

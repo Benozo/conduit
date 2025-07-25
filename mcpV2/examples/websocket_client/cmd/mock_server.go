@@ -12,8 +12,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/benozo/neuron-mcp/protocol"
 	"github.com/gorilla/websocket"
-	"github.com/modelcontextprotocol/go-sdk/protocol"
 )
 
 var upgrader = websocket.Upgrader{

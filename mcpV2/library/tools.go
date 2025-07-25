@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/modelcontextprotocol/go-sdk/protocol"
+	"github.com/benozo/neuron-mcp/protocol"
 )
 
 // ComponentRegistry provides pure library access to MCP components

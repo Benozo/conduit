@@ -15,9 +15,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/modelcontextprotocol/go-sdk/client"
-	"github.com/modelcontextprotocol/go-sdk/protocol"
-	"github.com/modelcontextprotocol/go-sdk/transport"
+	"github.com/benozo/neuron-mcp/client"
+	"github.com/benozo/neuron-mcp/protocol"
+	"github.com/benozo/neuron-mcp/transport"
 )
 
 func main() {

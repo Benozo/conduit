@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/modelcontextprotocol/go-sdk/protocol"
+	"github.com/benozo/neuron-mcp/protocol"
 )
 
 // HTTPTransport implements HTTP/SSE transport for MCP

@@ -9,7 +9,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/modelcontextprotocol/go-sdk/protocol"
+	"github.com/benozo/neuron-mcp/protocol"
 )
 
 // Common transport errors

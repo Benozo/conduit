@@ -219,7 +219,7 @@ package main
 
 import (
     "context"
-    "github.com/modelcontextprotocol/go-sdk/library"
+    "github.com/benozo/neuron-mcp/library"
 )
 
 type App struct {

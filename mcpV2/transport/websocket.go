@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/benozo/neuron-mcp/protocol"
 	"github.com/gorilla/websocket"
-	"github.com/modelcontextprotocol/go-sdk/protocol"
 )
 
 // WebSocketTransport implements WebSocket transport for MCP

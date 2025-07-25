@@ -12,8 +12,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/modelcontextprotocol/go-sdk/protocol"
-	"github.com/modelcontextprotocol/go-sdk/transport"
+	"github.com/benozo/neuron-mcp/protocol"
+	"github.com/benozo/neuron-mcp/transport"
 )
 
 // Client provides MCP client functionality

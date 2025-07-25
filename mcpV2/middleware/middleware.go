@@ -8,7 +8,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/modelcontextprotocol/go-sdk/protocol"
+	"github.com/benozo/neuron-mcp/protocol"
 )
 
 // Handler represents the final handler in the middleware chain

@@ -9,7 +9,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/modelcontextprotocol/go-sdk/protocol"
+	"github.com/benozo/neuron-mcp/protocol"
 )
 
 // StdioTransport implements Transport for stdio communication

@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/modelcontextprotocol/go-sdk/transport"
+	"github.com/benozo/neuron-mcp/transport"
 )
 
 func TestNewClient(t *testing.T) {

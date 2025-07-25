@@ -25,7 +25,7 @@ The official Go SDK for the [Model Context Protocol (MCP)](https://modelcontextp
 ### Installation
 
 ```bash
-go get github.com/modelcontextprotocol/go-sdk
+go get github.com/benozo/neuron-mcp
 ```
 
 ### Pure Library Usage (Recommended for Embedding)
@@ -36,8 +36,8 @@ package main
 import (
     "context"
     "fmt"
-    "github.com/modelcontextprotocol/go-sdk/library"
-    "github.com/modelcontextprotocol/go-sdk/protocol"
+    "github.com/benozo/neuron-mcp/library"
+    "github.com/benozo/neuron-mcp/protocol"
 )
 
 func main() {
@@ -77,9 +77,9 @@ package main
 
 import (
     "context"
-    "github.com/modelcontextprotocol/go-sdk/server"
-    "github.com/modelcontextprotocol/go-sdk/transport"
-    "github.com/modelcontextprotocol/go-sdk/protocol"
+    "github.com/benozo/neuron-mcp/server"
+    "github.com/benozo/neuron-mcp/transport"
+    "github.com/benozo/neuron-mcp/protocol"
 )
 
 func main() {
@@ -130,9 +130,9 @@ package main
 
 import (
     "context"
-    "github.com/modelcontextprotocol/go-sdk/client"
-    "github.com/modelcontextprotocol/go-sdk/transport"
-    "github.com/modelcontextprotocol/go-sdk/protocol"
+    "github.com/benozo/neuron-mcp/client"
+    "github.com/benozo/neuron-mcp/transport"
+    "github.com/benozo/neuron-mcp/protocol"
 )
 
 func main() {
@@ -289,7 +289,7 @@ server.RegisterToolWithBuilder("text_transform").
 The SDK includes comprehensive testing utilities:
 
 ```go
-import "github.com/modelcontextprotocol/go-sdk/testing"
+import "github.com/benozo/neuron-mcp/testing"
 
 func TestMyTool(t *testing.T) {
     server := server.NewServer(nil)
@@ -395,8 +395,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Documentation**: [docs/](docs/)
 - **Examples**: [examples/](examples/)
-- **Issues**: [GitHub Issues](https://github.com/modelcontextprotocol/go-sdk/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/modelcontextprotocol/go-sdk/discussions)
+- **Issues**: [GitHub Issues](https://github.com/benozo/neuron-mcp/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/benozo/neuron-mcp/discussions)
 
 ## Roadmap
 
