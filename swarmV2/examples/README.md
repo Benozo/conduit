@@ -28,11 +28,14 @@ Illustrates hybrid agent coordination with:
 - Metrics collection and reporting
 - Real AI integration for coordination insights
 
-### 4. Custom Workflow (`custom_workflow/`)
-Demonstrates building custom workflows with:
-- Custom agent interactions
-- Workflow creation and execution
-- Performance monitoring
+### 4. Cloudflare Workers AI (`cloudflare_ai/`)
+Demonstrates edge computing AI with Cloudflare Workers AI:
+- **Global Edge Network**: AI processing on 200+ worldwide locations
+- **Multiple AI Models**: Support for Llama, Mistral, Phi, Gemma models
+- **Collaborative Workflow**: Multi-agent business scenario (analysis → content → strategy)
+- **Cost-Effective**: Pay-per-use serverless AI without infrastructure
+- **Low Latency**: Edge computing for faster AI responses
+- **Easy Integration**: Simple API integration with robust error handling
 
 ### 5. Ollama Agent (`ollama_agent/`)
 Shows real LLM integration with Ollama:
@@ -69,6 +72,9 @@ cd react_workflow && go run main.go
 
 # Run Coordinator demo
 cd coordinator_demo && go run main.go
+
+# Run Cloudflare Workers AI example
+cd cloudflare_ai && go run main.go
 
 # Run Custom workflow example
 cd custom_workflow && go run main.go
