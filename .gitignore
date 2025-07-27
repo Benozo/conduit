@@ -3,3 +3,4 @@ script_tests/*
 generated_pages/*
 bin/*
 scopes/*
+swarmV2/data/*
