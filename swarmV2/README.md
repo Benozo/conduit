@@ -176,6 +176,37 @@ The framework includes comprehensive examples demonstrating various use cases:
    - End-to-end vector database RAG
    - Semantic search and generation
 
+8. **☁️ Cloudflare Workers AI** (`examples/cloudflare_ai/`)
+   - Edge computing AI with Cloudflare Workers
+   - Global low-latency inference
+
+## 🐳 RAG Infrastructure (Docker Compose)
+
+SwarmV2 includes a comprehensive Docker Compose setup for RAG infrastructure:
+
+```bash
+# Start all RAG services (Milvus, Weaviate, PostgreSQL+pgvector, Ollama, UIs)
+./rag-infrastructure.sh start
+
+# View all access URLs
+./rag-infrastructure.sh urls
+```
+
+**Included Services:**
+- **Vector Databases**: Milvus, Weaviate, PostgreSQL+pgvector
+- **Management UIs**: Attu (Milvus), Weaviate Console, pgAdmin
+- **AI Services**: Ollama with WebUI
+- **Supporting**: Redis, MinIO, etcd
+
+**Access URLs:**
+- Milvus UI (Attu): http://localhost:3000
+- Weaviate Console: http://localhost:8081  
+- pgAdmin: http://localhost:5050
+- Ollama WebUI: http://localhost:8083
+- Redis Commander: http://localhost:8082
+
+For detailed setup instructions, see [RAG Infrastructure Guide](docs/RAG_INFRASTRUCTURE.md).
+
 ### Running Examples
 
 ```bash
