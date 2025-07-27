@@ -271,18 +271,19 @@ func main() {
 	fmt.Println("✅ Ollama connection successful!")
 
 	// *** CRITICAL: Setup and verify documents before running SwarmV2 agents ***
-	fmt.Println("\n" + strings.Repeat("=", 60))
-	fmt.Println("� DOCUMENT SETUP AND VERIFICATION (Required before SwarmV2)")
-	fmt.Println(strings.Repeat("=", 60))
+	// Uncommment to setup and verify documents in Milvus collection
+	// fmt.Println("\n" + strings.Repeat("=", 60))
+	// fmt.Println("� DOCUMENT SETUP AND VERIFICATION (Required before SwarmV2)")
+	// fmt.Println(strings.Repeat("=", 60))
 
-	if err := setupAndVerifyDocuments(ctx, retriever, ragStore, collectionName); err != nil {
-		log.Fatalf("❌ CRITICAL ERROR: Document setup failed: %v\n"+
-			"SwarmV2 agents cannot run without verified documents in the knowledge base.", err)
-	}
+	// if err := setupAndVerifyDocuments(ctx, retriever, ragStore, collectionName); err != nil {
+	// 	log.Fatalf("❌ CRITICAL ERROR: Document setup failed: %v\n"+
+	// 		"SwarmV2 agents cannot run without verified documents in the knowledge base.", err)
+	// }
 
-	fmt.Println(strings.Repeat("=", 60))
-	fmt.Println("✅ DOCUMENT VERIFICATION COMPLETE - SwarmV2 agents can now run safely!")
-	fmt.Println(strings.Repeat("=", 60))
+	// fmt.Println(strings.Repeat("=", 60))
+	// fmt.Println("✅ DOCUMENT VERIFICATION COMPLETE - SwarmV2 agents can now run safely!")
+	// fmt.Println(strings.Repeat("=", 60))
 
 	// Display stats if available
 	stats, err := retriever.GetStats(ctx)
